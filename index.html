@@ -425,7 +425,7 @@ nav.scrolled {
 
 /* ── SKILLS CONSTELLATION ── */
 #skill-canvas-wrap {
-  width: 100%; height: 500px;
+  width: 100%; height: 620px;
   position: relative; overflow: hidden;
   border: 1px solid rgba(26,21,16,.1);
   border-radius: 4px;
@@ -665,8 +665,8 @@ footer span {
     <p class="hero-desc" id="hero-type-target"></p>
     <div class="hero-cta">
       <a href="https://linkedin.com/in/ramibabas" target="_blank" class="btn-mag btn-solid"><span>LinkedIn</span></a>
-      <a href="/cdn-cgi/l/email-protection#3052515251431e42515d5970575d51595c1e535f5d" class="btn-mag btn-outline"><span>Email Me</span></a>
-      <a href="https://babasrami.github.io/portfolio/" target="_blank" class="btn-mag btn-outline"><span>Portfolio</span></a>
+      <a href="/cdn-cgi/l/email-protection#086a696a697b267a696561486f65696164266b6765" class="btn-mag btn-outline"><span>Email Me</span></a>
+
     </div>
   </div>
   <div class="hero-right">
@@ -917,8 +917,8 @@ footer span {
       <p class="contact-sub">Open to collaborations at the intersection of biotechnology and AI — bioinformatics, cancer genomics, precision medicine, NGS analysis.</p>
     </div>
     <div class="contact-links">
-      <a href="/cdn-cgi/l/email-protection#e88a898a899bc69a898581a88f85898184c68b8785" class="contact-link">
-        <div><div class="contact-link-label">Email</div><div class="contact-link-val"><span class="__cf_email__" data-cfemail="c4a6a5a6a5b7eab6a5a9ad84a3a9a5ada8eaa7aba9">[email&#160;protected]</span></div></div>
+      <a href="/cdn-cgi/l/email-protection#b8dad9dad9cb96cad9d5d1f8dfd5d9d1d496dbd7d5" class="contact-link">
+        <div><div class="contact-link-label">Email</div><div class="contact-link-val"><span class="__cf_email__" data-cfemail="87e5e6e5e6f4a9f5e6eaeec7e0eae6eeeba9e4e8ea">[email&#160;protected]</span></div></div>
         <span class="contact-arrow">↗</span>
       </a>
       <a href="https://linkedin.com/in/ramibabas" target="_blank" class="contact-link">
@@ -933,17 +933,14 @@ footer span {
         <div><div class="contact-link-label">ORCID</div><div class="contact-link-val">0009-0006-5466-2482</div></div>
         <span class="contact-arrow">↗</span>
       </a>
-      <a href="https://babasrami.github.io/portfolio/" target="_blank" class="contact-link">
-        <div><div class="contact-link-label">Portfolio</div><div class="contact-link-val">babasrami.github.io/portfolio</div></div>
-        <span class="contact-arrow">↗</span>
-      </a>
+
     </div>
   </div>
 </section>
 
 <footer>
   <span>Rami Babas · Patras, Greece · +30 694 729 9927</span>
-  <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8defecefecfea3ffece0e4cdeae0ece4e1a3eee2e0">[email&#160;protected]</a></span>
+  <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfadaeadaebce1bdaea2a68fa8a2aea6a3e1aca0a2">[email&#160;protected]</a></span>
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -1242,18 +1239,27 @@ document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDe
   let hov = -1;
 
   function initNodes() {
-    nodes = skillData.map((s, i) => ({
-      ...s,
-      x: W * 0.1 + Math.random() * W * 0.8,
-      y: H * 0.1 + Math.random() * H * 0.8,
-      vx: (Math.random()-0.5)*0.5,
-      vy: (Math.random()-0.5)*0.5,
-      r: 18 + s.mass * 8,
-    }));
+    // Place each node in its category quadrant to start spread out
+    const catCX = [0.26, 0.74, 0.26, 0.74];
+    const catCY = [0.28, 0.28, 0.72, 0.72];
+    const catCount = [0,0,0,0];
+    nodes = skillData.map((s, i) => {
+      const idx = catCount[s.cat]++;
+      const angle = (idx / 7) * Math.PI * 2 + s.cat * 0.8;
+      const spread = 80 + idx * 18;
+      return {
+        ...s,
+        x: W * catCX[s.cat] + Math.cos(angle) * spread * 0.6 + (Math.random()-0.5)*30,
+        y: H * catCY[s.cat] + Math.sin(angle) * spread * 0.6 + (Math.random()-0.5)*30,
+        vx: (Math.random()-0.5)*0.3,
+        vy: (Math.random()-0.5)*0.3,
+        r: 18 + s.mass * 8,
+      };
+    });
   }
 
   resize();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { resize(); for(let i=0;i<300;i++) simStep(); });
 
   canvas.addEventListener('mousemove', e => {
     const r = canvas.getBoundingClientRect();
@@ -1281,28 +1287,38 @@ document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDe
   function simStep() {
     nodes.forEach((n, i) => {
       if (dragging === i) return;
-      // repulsion
+      // repulsion — strong enough to prevent overlap
       nodes.forEach((m, j) => {
         if (i === j) return;
         const dx = n.x - m.x, dy = n.y - m.y;
-        const dist = Math.max(Math.hypot(dx, dy), 1);
-        const force = 1800 / (dist * dist);
-        n.vx += (dx / dist) * force * 0.01;
-        n.vy += (dy / dist) * force * 0.01;
+        const dist = Math.max(Math.hypot(dx, dy), 0.1);
+        const minDist = n.r + m.r + 12; // enforce minimum separation
+        if (dist < minDist) {
+          // strong overlap resolution
+          const overlap = (minDist - dist) / dist;
+          n.vx += dx * overlap * 0.25;
+          n.vy += dy * overlap * 0.25;
+        } else {
+          // gentle long-range repulsion
+          const force = 3200 / (dist * dist);
+          n.vx += (dx / dist) * force * 0.008;
+          n.vy += (dy / dist) * force * 0.008;
+        }
       });
       // center attraction
-      n.vx += (W/2 - n.x) * 0.0008;
-      n.vy += (H/2 - n.y) * 0.0008;
+      n.vx += (W/2 - n.x) * 0.0006;
+      n.vy += (H/2 - n.y) * 0.0006;
       // category clustering
-      const catCX = [W*0.28, W*0.72, W*0.28, W*0.72];
-      const catCY = [H*0.3, H*0.3, H*0.7, H*0.7];
-      n.vx += (catCX[n.cat] - n.x) * 0.0015;
-      n.vy += (catCY[n.cat] - n.y) * 0.0015;
+      const catCX = [W*0.26, W*0.74, W*0.26, W*0.74];
+      const catCY = [H*0.28, H*0.28, H*0.72, H*0.72];
+      n.vx += (catCX[n.cat] - n.x) * 0.0012;
+      n.vy += (catCY[n.cat] - n.y) * 0.0012;
 
-      n.vx *= 0.88; n.vy *= 0.88;
+      n.vx *= 0.82; n.vy *= 0.82;
       n.x += n.vx; n.y += n.vy;
-      n.x = Math.max(n.r, Math.min(W - n.r, n.x));
-      n.y = Math.max(n.r, Math.min(H - n.r, n.y));
+      // wall bounce with padding
+      n.x = Math.max(n.r + 8, Math.min(W - n.r - 8, n.x));
+      n.y = Math.max(n.r + 8, Math.min(H - n.r - 8, n.y));
     });
   }
 
@@ -1356,6 +1372,8 @@ document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDe
     simStep();
     requestAnimationFrame(drawFrame);
   }
+  // Pre-settle so nodes aren't overlapping on first render
+  for (let i = 0; i < 600; i++) simStep();
   drawFrame();
 })();
 
