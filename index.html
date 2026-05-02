@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rami Babas — Biotechnology Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:    #1a1510;
+  --ink2:   #3d3328;
+  --ink3:   #7a6a58;
+  --paper:  #f5f0e8;
+  --paper2: #ede6d6;
+  --paper3: #e4daca;
+  --terra:  oklch(62% 0.14 42);
+  --amber:  oklch(72% 0.16 72);
+  --sage:   oklch(58% 0.10 155);
+  --slate:  oklch(42% 0.06 230);
+  --f-display: 'Fraunces', serif;
+  --f-body:    'DM Sans', sans-serif;
+  --f-mono:    'DM Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--f-body);
+  background: var(--paper);
+  color: var(--ink);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+#cursor {
+  position: fixed; z-index: 9999; pointer-events: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--terra);
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, opacity .2s;
+  mix-blend-mode: multiply;
+}
+#cursor-ring {
+  position: fixed; z-index: 9998; pointer-events: none;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--terra);
+  transform: translate(-50%,-50%);
+  transition: all .12s ease-out;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+body:hover #cursor { opacity: 1; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  padding: 20px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: background .3s, backdrop-filter .3s;
+}
+nav.scrolled {
+  background: rgba(245,240,232,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(26,21,16,0.08);
+}
+.nav-logo {
+  font-family: var(--f-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex; gap: 32px; list-style: none;
+}
+.nav-links a {
+  font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
+  color: var(--ink3); text-decoration: none; text-transform: uppercase;
+  position: relative; transition: color .2s;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 1.5px; background: var(--terra);
+  transition: width .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-links a:hover { color: var(--ink); }
+.nav-links a:hover::after { width: 100%; }
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 120px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-left { position: relative; z-index: 2; }
+.hero-eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px; letter-spacing: 0.2em;
+  color: var(--terra); text-transform: uppercase;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 28px;
+  opacity: 0; animation: slideRight .7s .1s forwards;
+}
+.hero-eyebrow::before {
+  content: ''; display: block;
+  width: 32px; height: 1px; background: var(--terra);
+}
+.hero-name {
+  font-family: var(--f-display);
+  font-size: clamp(56px, 7vw, 100px);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  margin-bottom: 32px;
+  opacity: 0; animation: slideRight .8s .25s forwards;
+}
+.hero-name em {
+  font-style: italic; font-weight: 300;
+  color: var(--terra);
+}
+.hero-desc {
+  font-size: 16px; line-height: 1.75;
+  color: var(--ink2); max-width: 440px;
+  margin-bottom: 48px;
+  opacity: 0; animation: slideRight .8s .4s forwards;
+}
+.hero-cta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  opacity: 0; animation: slideRight .8s .55s forwards;
+}
+.btn-mag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 4px;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
+  text-decoration: none; text-transform: uppercase;
+  position: relative; overflow: hidden;
+  transition: color .3s;
+}
+.btn-mag::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--ink);
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.btn-mag:hover::before { transform: translateY(0); }
+.btn-mag:hover { color: var(--paper); }
+.btn-solid {
+  background: var(--ink); color: var(--paper);
+  border: 1.5px solid var(--ink);
+}
+.btn-solid::before { background: var(--terra); }
+.btn-outline {
+  background: transparent; color: var(--ink);
+  border: 1.5px solid var(--ink3);
+}
+.btn-mag span { position: relative; z-index: 1; }
+
+/* hero right — molecule canvas */
+.hero-right {
+  display: flex; justify-content: center; align-items: center;
+  position: relative;
+}
+#mol-canvas {
+  width: 460px; height: 460px;
+  cursor: none;
+}
+
+/* hero bg grain */
+#hero::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    radial-gradient(ellipse 70% 60% at 80% 40%, rgba(180,120,60,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 20% 80%, rgba(80,120,80,.05) 0%, transparent 70%);
+}
+
+/* large BG number */
+.hero-index {
+  position: absolute; right: 48px; bottom: 40px;
+  font-family: var(--f-display); font-size: 200px; font-weight: 900;
+  color: rgba(26,21,16,0.04); line-height: 1;
+  pointer-events: none; z-index: 0;
+  letter-spacing: -0.05em;
+}
+
+/* ── MARQUEE STRIP ── */
+.marquee-wrap {
+  border-top: 1px solid rgba(26,21,16,0.1);
+  border-bottom: 1px solid rgba(26,21,16,0.1);
+  background: var(--paper2);
+  overflow: hidden; padding: 14px 0;
+}
+.marquee-track {
+  display: flex; gap: 0;
+  animation: marquee 28s linear infinite;
+  white-space: nowrap;
+}
+.marquee-item {
+  font-family: var(--f-mono); font-size: 12px;
+  letter-spacing: 0.12em; color: var(--ink3);
+  text-transform: uppercase;
+  padding: 0 32px;
+  display: flex; align-items: center; gap: 32px;
+}
+.marquee-item::after {
+  content: '✦'; color: var(--terra); font-size: 8px;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── SECTION LAYOUT ── */
+.section-wrap {
+  padding: 100px 48px;
+  position: relative;
+}
+.section-wrap.alt { background: var(--paper2); }
+
+.section-header {
+  display: flex; align-items: baseline; gap: 24px;
+  margin-bottom: 64px;
+}
+.section-num {
+  font-family: var(--f-mono); font-size: 12px;
+  color: var(--terra); letter-spacing: 0.1em;
+}
+.section-title {
+  font-family: var(--f-display);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 900; letter-spacing: -0.03em; line-height: 1;
+}
+.section-title em { font-style: italic; font-weight: 300; color: var(--terra); }
+.section-rule {
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(26,21,16,.15), transparent);
+  margin-left: 16px; align-self: center;
+}
+
+/* ── STATS ── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+  margin-bottom: 80px;
+}
+.stat-block {
+  background: var(--paper3);
+  padding: 40px 32px;
+  transition: background .3s;
+  cursor: default;
+}
+.stat-block:hover { background: var(--ink); }
+.stat-block:hover .stat-n { color: var(--amber); }
+.stat-block:hover .stat-l { color: var(--paper3); }
+.stat-n {
+  font-family: var(--f-display); font-size: 52px; font-weight: 900;
+  letter-spacing: -0.04em; line-height: 1;
+  color: var(--ink); margin-bottom: 8px;
+  transition: color .3s;
+}
+.stat-l {
+  font-size: 12px; font-family: var(--f-mono);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink3); transition: color .3s;
+}
+
+/* ── ACHIEVEMENT PANELS ── */
+.ach-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+}
+.ach-panel {
+  border: 1px solid rgba(26,21,16,.1);
+  border-radius: 2px;
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+  transition: transform .4s cubic-bezier(.34,1.2,.64,1), box-shadow .4s;
+  cursor: default;
+}
+.ach-panel::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--terra);
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+}
+.ach-panel:hover::before { transform: scaleY(1); }
+.ach-panel:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 48px rgba(26,21,16,.12);
+}
+.ach-num {
+  font-family: var(--f-display); font-size: 40px; font-weight: 900;
+  letter-spacing: -0.03em; color: var(--terra); margin-bottom: 8px;
+}
+.ach-title { font-size: 16px; font-weight: 500; margin-bottom: 10px; }
+.ach-body { font-size: 13px; color: var(--ink3); line-height: 1.7; }
+.ach-tag {
+  display: inline-block; margin-top: 16px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--terra); border: 1px solid var(--terra);
+  padding: 3px 10px; border-radius: 100px;
+}
+
+/* ── PUBLICATION ── */
+.pub-block {
+  border: 1px solid rgba(26,21,16,.12);
+  border-radius: 2px;
+  padding: 48px;
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+  margin-bottom: 80px;
+}
+.pub-block::after {
+  content: '"';
+  position: absolute; right: 40px; top: -20px;
+  font-family: var(--f-display); font-size: 200px; font-weight: 900;
+  color: rgba(255,255,255,0.04); line-height: 1;
+  pointer-events: none;
+}
+.pub-status {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pub-status::before {
+  content: '';
+  display: inline-block; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--amber);
+  animation: blink 1.8s ease-in-out infinite;
+}
+@keyframes blink {
+  0%,100% { opacity:1; } 50% { opacity:0.2; }
+}
+.pub-title-text {
+  font-family: var(--f-display); font-size: clamp(18px, 2.5vw, 26px);
+  font-weight: 700; line-height: 1.35; margin-bottom: 20px;
+  color: var(--paper);
+}
+.pub-meta { font-size: 13px; color: rgba(245,240,232,.5); line-height: 1.6; }
+.pub-journal { font-family: var(--f-mono); font-size: 12px; color: var(--amber); margin-top: 12px; }
+
+/* ── EXPERIENCE TIMELINE ── */
+.tl-wrap {
+  position: relative;
+  padding-left: 0;
+}
+.tl-item {
+  display: grid;
+  grid-template-columns: 140px 1px 1fr;
+  gap: 0 32px;
+  margin-bottom: 0;
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s, transform .6s;
+}
+.tl-item.visible { opacity: 1; transform: translateY(0); }
+
+.tl-date-col {
+  text-align: right;
+  padding: 32px 0;
+}
+.tl-date {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.08em; color: var(--terra);
+  text-transform: uppercase;
+}
+.tl-line-col {
+  display: flex; flex-direction: column; align-items: center;
+}
+.tl-line-top, .tl-line-bot {
+  flex: 1; width: 1px;
+  background: rgba(26,21,16,.15);
+}
+.tl-dot-wrap {
+  width: 12px; height: 12px; flex-shrink: 0;
+  margin: 8px -5.5px;
+}
+.tl-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--terra);
+  background: var(--paper);
+  transition: background .3s, transform .3s;
+}
+.tl-item:hover .tl-dot {
+  background: var(--terra);
+  transform: scale(1.4);
+}
+.tl-content {
+  padding: 32px 0 32px 0;
+  border-bottom: 1px solid rgba(26,21,16,.07);
+}
+.tl-item:last-child .tl-content { border-bottom: none; }
+.tl-role {
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 700; letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.tl-org {
+  font-size: 13px; color: var(--ink3);
+  margin-bottom: 16px; font-style: italic;
+}
+.tl-bullets {
+  list-style: none; display: flex; flex-direction: column; gap: 7px;
+}
+.tl-bullets li {
+  font-size: 14px; color: var(--ink2); line-height: 1.65;
+  padding-left: 18px; position: relative;
+}
+.tl-bullets li::before {
+  content: '→'; position: absolute; left: 0;
+  color: var(--terra); font-size: 12px; top: 2px;
+}
+
+/* ── SKILLS CONSTELLATION ── */
+#skill-canvas-wrap {
+  width: 100%; height: 500px;
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(26,21,16,.1);
+  border-radius: 4px;
+  background: var(--paper3);
+  cursor: grab;
+}
+#skill-canvas-wrap:active { cursor: grabbing; }
+#skill-canvas { width: 100%; height: 100%; }
+.skill-legend {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  margin-top: 24px;
+}
+.skill-legend-item {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink3);
+}
+.legend-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+
+/* ── EDUCATION ── */
+.edu-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+}
+.edu-card {
+  padding: 32px 28px;
+  border: 1px solid rgba(26,21,16,.1);
+  border-radius: 2px;
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+  transition: transform .35s cubic-bezier(.34,1.2,.64,1), box-shadow .35s;
+  cursor: default;
+}
+.edu-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(26,21,16,.1);
+}
+.edu-year-badge {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.1em; color: var(--terra);
+  margin-bottom: 14px; text-transform: uppercase;
+}
+.edu-degree {
+  font-family: var(--f-display); font-size: 18px;
+  font-weight: 700; margin-bottom: 6px; line-height: 1.3;
+}
+.edu-school {
+  font-size: 13px; color: var(--ink3);
+  font-style: italic; margin-bottom: 10px;
+}
+.edu-focus { font-size: 12px; color: var(--ink3); line-height: 1.6; }
+.edu-num {
+  position: absolute; bottom: 16px; right: 20px;
+  font-family: var(--f-display); font-size: 80px; font-weight: 900;
+  color: rgba(26,21,16,0.04); line-height: 1; pointer-events: none;
+}
+
+/* ── CERTIFICATIONS ── */
+.cert-flex {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+.cert-chip {
+  padding: 10px 18px;
+  border: 1px solid rgba(26,21,16,.12);
+  border-radius: 100px;
+  font-size: 12px; color: var(--ink2);
+  background: var(--paper);
+  transition: all .25s;
+  cursor: default;
+  position: relative; overflow: hidden;
+}
+.cert-chip::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--ink);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+}
+.cert-chip:hover::before { transform: scaleX(1); }
+.cert-chip:hover { color: var(--paper); border-color: var(--ink); }
+.cert-chip span { position: relative; z-index: 1; }
+.cert-org {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--terra); margin-right: 6px;
+}
+
+/* ── LANGUAGES ── */
+.lang-row {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 80px;
+}
+.lang-pill {
+  display: flex; align-items: center; gap: 20px;
+  padding: 20px 32px;
+  background: var(--paper3);
+  border-radius: 2px;
+  transition: background .3s, transform .3s;
+  cursor: default;
+}
+.lang-pill:hover { background: var(--ink); transform: translateY(-4px); }
+.lang-pill:hover .lang-name { color: var(--paper); }
+.lang-pill:hover .lang-level { color: var(--amber); }
+.lang-name {
+  font-family: var(--f-display); font-size: 20px; font-weight: 700;
+  color: var(--ink); transition: color .3s;
+}
+.lang-level {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--terra); transition: color .3s;
+}
+
+/* ── CONTACT ── */
+#contact { background: var(--ink); color: var(--paper); padding: 100px 48px; }
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: start;
+}
+.contact-heading {
+  font-family: var(--f-display); font-size: clamp(40px, 6vw, 80px);
+  font-weight: 900; letter-spacing: -0.04em; line-height: 0.95;
+  margin-bottom: 24px;
+}
+.contact-heading em { font-style: italic; font-weight: 300; color: var(--amber); }
+.contact-sub {
+  font-size: 15px; color: rgba(245,240,232,.5); line-height: 1.7; max-width: 360px;
+}
+.contact-links {
+  display: flex; flex-direction: column; gap: 2px;
+  padding-top: 8px;
+}
+.contact-link {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(245,240,232,.1);
+  text-decoration: none; color: var(--paper);
+  transition: padding-left .3s, color .3s;
+  group: true;
+}
+.contact-link:hover { padding-left: 12px; color: var(--amber); }
+.contact-link:hover .contact-arrow { transform: translateX(6px) rotate(-45deg); }
+.contact-link-label {
+  font-family: var(--f-display); font-size: 22px;
+  font-weight: 700;
+}
+.contact-link-val {
+  font-family: var(--f-mono); font-size: 12px;
+  letter-spacing: 0.06em; color: rgba(245,240,232,.4);
+}
+.contact-arrow {
+  font-size: 18px; opacity: 0.4;
+  transition: transform .3s, opacity .3s;
+}
+.contact-link:hover .contact-arrow { opacity: 1; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink); border-top: 1px solid rgba(245,240,232,.08);
+  padding: 24px 48px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+footer span {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.08em; color: rgba(245,240,232,.3);
+  text-transform: uppercase;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--paper2); }
+::-webkit-scrollbar-thumb { background: var(--terra); }
+
+/* ── ANIMATIONS ── */
+@keyframes slideRight {
+  from { opacity:0; transform: translateX(-24px); }
+  to   { opacity:1; transform: translateX(0); }
+}
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .7s, transform .7s;
+}
+.reveal.visible { opacity:1; transform: translateY(0); }
+
+/* ── TYPING CURSOR ── */
+.type-cursor {
+  display: inline-block; width: 2px; height: 1em;
+  background: var(--terra); vertical-align: text-bottom;
+  animation: blink .8s step-end infinite;
+  margin-left: 2px;
+}
+
+/* page progress bar */
+#progress {
+  position: fixed; top: 0; left: 0; z-index: 9000;
+  height: 3px; background: var(--terra);
+  width: 0%; transition: width .1s;
+}
+
+@media (max-width: 768px) {
+  #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
+  .hero-right { display: none; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .ach-grid { grid-template-columns: 1fr; }
+  .edu-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .section-wrap { padding: 70px 24px; }
+  nav { padding: 16px 24px; }
+  .tl-item { grid-template-columns: 90px 1px 1fr; gap: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">RB</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Work</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Biotechnology Engineer</div>
+    <h1 class="hero-name">Rami<br><em>Babas</em></h1>
+    <p class="hero-desc" id="hero-type-target"></p>
+    <div class="hero-cta">
+      <a href="https://linkedin.com/in/ramibabas" target="_blank" class="btn-mag btn-solid"><span>LinkedIn</span></a>
+      <a href="/cdn-cgi/l/email-protection#3052515251431e42515d5970575d51595c1e535f5d" class="btn-mag btn-outline"><span>Email Me</span></a>
+      <a href="https://babasrami.github.io/portfolio/" target="_blank" class="btn-mag btn-outline"><span>Portfolio</span></a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <canvas id="mol-canvas" width="460" height="460"></canvas>
+  </div>
+  <div class="hero-index">01</div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="marquee-track"></div>
+</div>
+
+<!-- ABOUT / STATS -->
+<div class="section-wrap" id="about">
+  <div class="section-header reveal">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Key <em>Numbers</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="stats-row reveal">
+    <div class="stat-block"><div class="stat-n" data-target="98.44" data-dec="2">0</div><div class="stat-l">% CNN Accuracy</div></div>
+    <div class="stat-block"><div class="stat-n" data-target="44" data-dec="0">0</div><div class="stat-l">ECM Proteins</div></div>
+    <div class="stat-block"><div class="stat-n" data-target="4" data-dec="0">0</div><div class="stat-l">NGS Pipelines</div></div>
+    <div class="stat-block"><div class="stat-n" data-target="15" data-dec="0">0</div><div class="stat-l">Certifications</div></div>
+  </div>
+
+  <div class="section-header reveal" style="margin-top:80px">
+    <span class="section-num">02</span>
+    <h2 class="section-title">High<em>lights</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="ach-grid reveal">
+    <div class="ach-panel">
+      <div class="ach-num">96–98%</div>
+      <div class="ach-title">CNN Crop Disease Detection</div>
+      <div class="ach-body">Convolutional neural network trained for multi-class agricultural pathology classification — exceeding industry benchmarks with rigorous validation.</div>
+      <span class="ach-tag">Deep Learning</span>
+    </div>
+    <div class="ach-panel">
+      <div class="ach-num" style="color:var(--sage)">Under Review</div>
+      <div class="ach-title">Cancer Prognosis Publication</div>
+      <div class="ach-body">Integrative survival prediction in breast cancer using ECM protease signatures — submitted to <em>Cancers</em> (MDPI), Tumor Microenvironment section.</div>
+      <span class="ach-tag" style="color:var(--sage);border-color:var(--sage)">Publication</span>
+    </div>
+    <div class="ach-panel">
+      <div class="ach-num" style="color:var(--slate)">4 Pipelines</div>
+      <div class="ach-title">End-to-End NGS Analysis</div>
+      <div class="ach-body">RNA A-to-I editing, germline variant calling on GRCh38, and scRNA-seq pseudotime on GSE147821 — reproducible, publication-ready workflows.</div>
+      <span class="ach-tag" style="color:var(--slate);border-color:var(--slate)">Bioinformatics</span>
+    </div>
+    <div class="ach-panel">
+      <div class="ach-num" style="color:var(--amber)">STU</div>
+      <div class="ach-title">Cybernetics Research</div>
+      <div class="ach-body">Smart membrane process modelling and advanced control strategies at Slovak University of Technology — bridging engineering and biotechnology.</div>
+      <span class="ach-tag" style="color:var(--amber);border-color:var(--amber)">Process Control</span>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLICATION -->
+<div class="section-wrap alt">
+  <div class="section-header reveal">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Publi<em>cation</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="pub-block reveal">
+    <div class="pub-status">Under Review — Cancers (MDPI)</div>
+    <div class="pub-title-text">Integrative Survival Prediction in Breast Cancer Using Extracellular Matrix Protease Transcript Signatures and Clinical Variables: A Machine Learning Approach</div>
+    <div class="pub-meta">Babas R. · Vynios D.H.* · Kompothrekas A. · Boutsinas B. · Karamanos N.*<br>Biochemistry, Biochemical Analysis &amp; Matrix Pathobiochemistry Research Group · Dept. of Chemistry, University of Patras, Greece</div>
+    <div class="pub-journal">Cancers · Tumor Microenvironment Section · 2025</div>
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<div class="section-wrap" id="experience">
+  <div class="section-header reveal">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Experi<em>ence</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="tl-wrap">
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">03/2025–02/2026</div></div>
+      <div class="tl-line-col"><div class="tl-line-top"></div><div class="tl-dot-wrap"><div class="tl-dot"></div></div><div class="tl-line-bot"></div></div>
+      <div class="tl-content">
+        <div class="tl-role">Breast Cancer Survival Prediction</div>
+        <div class="tl-org">Master's Thesis · University of Patras, Greece</div>
+        <ul class="tl-bullets">
+          <li>Multi-model pipeline using 44 ECM proteases (MMP &amp; ADAM families) + clinical variables</li>
+          <li>Cox screening, subtype-specific analyses, Random Survival Forest with C-index benchmarking</li>
+          <li>Interactive web interface for patient-level predictions using trained model</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">07–10/2025</div></div>
+      <div class="tl-line-col"><div class="tl-line-top"></div><div class="tl-dot-wrap"><div class="tl-dot"></div></div><div class="tl-line-bot"></div></div>
+      <div class="tl-content">
+        <div class="tl-role">Researcher in Cybernetics</div>
+        <div class="tl-org">Slovak University of Technology, Bratislava</div>
+        <ul class="tl-bullets">
+          <li>Smart Process Control programme — cybernetics &amp; membrane process modelling</li>
+          <li>Advanced control strategies for improved efficiency and sustainability</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">2025</div></div>
+      <div class="tl-line-col"><div class="tl-line-top"></div><div class="tl-dot-wrap"><div class="tl-dot"></div></div><div class="tl-line-bot"></div></div>
+      <div class="tl-content">
+        <div class="tl-role">NGS Pipeline Development</div>
+        <div class="tl-org">Independent Research</div>
+        <ul class="tl-bullets">
+          <li>RNA A-to-I Editing — Python pipeline for Drosophila Mettl3 mutants with gene-level visualization</li>
+          <li>Germline Variant Calling — FreeBayes on GRCh38, multi-tool consensus, VCF outputs</li>
+          <li>scRNA-seq (Scanpy) — QC → clustering → pseudotime on GSE147821 (10x Genomics)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">01–07/2023</div></div>
+      <div class="tl-line-col"><div class="tl-line-top"></div><div class="tl-dot-wrap"><div class="tl-dot"></div></div><div class="tl-line-bot"></div></div>
+      <div class="tl-content">
+        <div class="tl-role">CNN Crop Diagnostic System</div>
+        <div class="tl-org">Master's Thesis · ENSBIOTECH, Algeria</div>
+        <ul class="tl-bullets">
+          <li>Deep learning model achieving 96%+ accuracy for multi-class crop disease classification</li>
+          <li>Large-scale data analysis with computational modeling and rigorous validation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">03–04/2023</div></div>
+      <div class="tl-line-col"><div class="tl-line-top"></div><div class="tl-dot-wrap"><div class="tl-dot"></div></div><div class="tl-line-bot"></div></div>
+      <div class="tl-content">
+        <div class="tl-role">Biotechnology Lab Assistant</div>
+        <div class="tl-org">Biotechnology Research Center (CRBt), Algeria</div>
+        <ul class="tl-bullets">
+          <li>Cell culture, sterilization, microscopic analysis, microfluidic device fabrication</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS CONSTELLATION -->
+<div class="section-wrap alt" id="skills">
+  <div class="section-header reveal">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Skill<em>set</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <p class="reveal" style="font-size:13px;color:var(--ink3);margin-bottom:24px;font-family:var(--f-mono);letter-spacing:0.05em;">
+    ↙ drag to orbit · hover nodes to explore
+  </p>
+  <div id="skill-canvas-wrap" class="reveal">
+    <canvas id="skill-canvas"></canvas>
+  </div>
+  <div class="skill-legend reveal">
+    <div class="skill-legend-item"><div class="legend-dot" style="background:var(--terra)"></div>AI / ML</div>
+    <div class="skill-legend-item"><div class="legend-dot" style="background:var(--sage)"></div>Bioinformatics</div>
+    <div class="skill-legend-item"><div class="legend-dot" style="background:var(--slate)"></div>Data Science</div>
+    <div class="skill-legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Lab &amp; Engineering</div>
+  </div>
+</div>
+
+<!-- EDUCATION -->
+<div class="section-wrap" id="education">
+  <div class="section-header reveal">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Edu<em>cation</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="edu-grid reveal">
+    <div class="edu-card">
+      <div class="edu-year-badge">2024 – 2026</div>
+      <div class="edu-degree">MSc Applied Biochemistry</div>
+      <div class="edu-school">University of Patras | NCSR Demokritos, Greece</div>
+      <div class="edu-focus">Clinical Chemistry · Biotechnology · Pharmaceutical Products Evaluation</div>
+      <div class="edu-num">01</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-year-badge">2023 – 2024</div>
+      <div class="edu-degree">Master: Food Quality &amp; Natural Products</div>
+      <div class="edu-school">CIHEAM MAICh, Greece</div>
+      <div class="edu-focus">Chemistry of Natural Products · Food Analytics</div>
+      <div class="edu-num">02</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-year-badge">2021 – 2023</div>
+      <div class="edu-degree">MSc Health Biotechnology</div>
+      <div class="edu-school">National Superior School of Biotechnology, Algeria</div>
+      <div class="edu-focus">Deep Learning for Precision Diagnostics</div>
+      <div class="edu-num">03</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-year-badge">2018 – 2021</div>
+      <div class="edu-degree">BSc Biotechnology Engineering</div>
+      <div class="edu-school">National Superior School of Biotechnology, Algeria</div>
+      <div class="edu-focus">Comprehensive Bio-engineering Foundation</div>
+      <div class="edu-num">04</div>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATIONS -->
+<div class="section-wrap alt">
+  <div class="section-header reveal">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Certifi<em>cations</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="cert-flex reveal">
+    <div class="cert-chip"><span><span class="cert-org">Siemens</span>gPROMS Foundational Skills</span></div>
+    <div class="cert-chip"><span><span class="cert-org">IBM</span>Machine Learning Professional</span></div>
+    <div class="cert-chip"><span><span class="cert-org">IBM</span>Deep Learning with TensorFlow</span></div>
+    <div class="cert-chip"><span><span class="cert-org">IBM</span>Machine Learning with Python</span></div>
+    <div class="cert-chip"><span><span class="cert-org">SAS</span>Statistical Thinking &amp; Quality Methods</span></div>
+    <div class="cert-chip"><span><span class="cert-org">SAS</span>Exploratory Data Analysis</span></div>
+    <div class="cert-chip"><span><span class="cert-org">SAS</span>Decision Making with Data</span></div>
+    <div class="cert-chip"><span><span class="cert-org">Labroots</span>mRNA Synthesis</span></div>
+    <div class="cert-chip"><span><span class="cert-org">Labroots</span>Single-cell RNA-seq</span></div>
+    <div class="cert-chip"><span><span class="cert-org">Labroots</span>Biomarker Translation</span></div>
+    <div class="cert-chip"><span><span class="cert-org">Labroots</span>Pharmacogenomics</span></div>
+    <div class="cert-chip"><span><span class="cert-org">ETS</span>TOEFL ITP — Advanced English</span></div>
+    <div class="cert-chip"><span><span class="cert-org">CVS Health</span>Customer Service</span></div>
+  </div>
+
+  <div class="section-header reveal" style="margin-top:80px">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Lang<em>uages</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="lang-row reveal">
+    <div class="lang-pill"><div class="lang-name">Arabic</div><div class="lang-level">Native</div></div>
+    <div class="lang-pill"><div class="lang-name">English</div><div class="lang-level">Advanced</div></div>
+    <div class="lang-pill"><div class="lang-name">French</div><div class="lang-level">Advanced</div></div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div>
+      <h2 class="contact-heading">Let's<br><em>work</em><br>together</h2>
+      <p class="contact-sub">Open to collaborations at the intersection of biotechnology and AI — bioinformatics, cancer genomics, precision medicine, NGS analysis.</p>
+    </div>
+    <div class="contact-links">
+      <a href="/cdn-cgi/l/email-protection#e88a898a899bc69a898581a88f85898184c68b8785" class="contact-link">
+        <div><div class="contact-link-label">Email</div><div class="contact-link-val"><span class="__cf_email__" data-cfemail="c4a6a5a6a5b7eab6a5a9ad84a3a9a5ada8eaa7aba9">[email&#160;protected]</span></div></div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a href="https://linkedin.com/in/ramibabas" target="_blank" class="contact-link">
+        <div><div class="contact-link-label">LinkedIn</div><div class="contact-link-val">linkedin.com/in/ramibabas</div></div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a href="https://github.com/babasrami" target="_blank" class="contact-link">
+        <div><div class="contact-link-label">GitHub</div><div class="contact-link-val">github.com/babasrami</div></div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a href="https://orcid.org/0009-0006-5466-2482" target="_blank" class="contact-link">
+        <div><div class="contact-link-label">ORCID</div><div class="contact-link-val">0009-0006-5466-2482</div></div>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <a href="https://babasrami.github.io/portfolio/" target="_blank" class="contact-link">
+        <div><div class="contact-link-label">Portfolio</div><div class="contact-link-val">babasrami.github.io/portfolio</div></div>
+        <span class="contact-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>Rami Babas · Patras, Greece · +30 694 729 9927</span>
+  <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8defecefecfea3ffece0e4cdeae0ece4e1a3eee2e0">[email&#160;protected]</a></span>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ── CUSTOM CURSOR ── */
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+  rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('a, button, [data-tilt], .stat-block, .cert-chip').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cur.style.width = '20px'; cur.style.height = '20px';
+    ring.style.width = '56px'; ring.style.height = '56px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cur.style.width = '12px'; cur.style.height = '12px';
+    ring.style.width = '36px'; ring.style.height = '36px';
+  });
+});
+
+/* ── SCROLL PROGRESS ── */
+const prog = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  prog.style.width = pct + '%';
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ── MARQUEE ── */
+const words = ['Deep Learning','Bioinformatics','NGS Analysis','Precision Medicine','Cancer Genomics','CNN','RNA-seq','Survival Analysis','Microfluidics','Python','TensorFlow','scRNA-seq','Variant Calling','ECM Proteases'];
+const track = document.getElementById('marquee-track');
+const items = [...words, ...words].map(w => {
+  const d = document.createElement('div'); d.className = 'marquee-item'; d.textContent = w; return d;
+});
+items.forEach(i => track.appendChild(i));
+
+/* ── TYPING EFFECT ── */
+const phrases = [
+  'Building AI pipelines for cancer prognosis.',
+  'Developing NGS workflows for genomic analysis.',
+  'Merging deep learning with life sciences.',
+  'Engineering precision diagnostic systems.'
+];
+const target = document.getElementById('hero-type-target');
+let pi = 0, ci = 0, del = false;
+function typeLoop() {
+  const phrase = phrases[pi];
+  if (!del) {
+    target.innerHTML = phrase.slice(0, ci) + '<span class="type-cursor"></span>';
+    ci++;
+    if (ci > phrase.length) { del = true; setTimeout(typeLoop, 1800); return; }
+    setTimeout(typeLoop, 45);
+  } else {
+    target.innerHTML = phrase.slice(0, ci) + '<span class="type-cursor"></span>';
+    ci--;
+    if (ci < 0) { del = false; pi = (pi + 1) % phrases.length; setTimeout(typeLoop, 300); return; }
+    setTimeout(typeLoop, 22);
+  }
+}
+setTimeout(typeLoop, 1200);
+
+/* ── SCROLL REVEAL ── */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.stat-n[data-target]').forEach(el => {
+        const end = parseFloat(el.dataset.target);
+        const dec = parseInt(el.dataset.dec);
+        const dur = 1600;
+        const start = performance.now();
+        (function tick(now) {
+          const t = Math.min((now - start) / dur, 1);
+          const ease = 1 - Math.pow(1 - t, 3);
+          el.textContent = (ease * end).toFixed(dec);
+          if (t < 1) requestAnimationFrame(tick);
+          else el.textContent = end.toFixed(dec);
+        })(performance.now());
+        delete el.dataset.target;
+      });
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+const tlObs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 100); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDelay = i * 0.08 + 's'; tlObs.observe(el); });
+
+/* ── MOLECULE CANVAS ── */
+(function() {
+  const canvas = document.getElementById('mol-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  let mouseX = W/2, mouseY = H/2;
+  let rotX = 0.3, rotY = 0.2, velX = 0, velY = 0;
+
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left;
+    mouseY = e.clientY - r.top;
+  });
+
+  // Build molecule (caffeine-like structure)
+  const atoms = [
+    {x:0,   y:-80, z:0,   type:'N', label:'N'},
+    {x:70,  y:-40, z:20,  type:'C', label:'C'},
+    {x:70,  y:40,  z:-10, type:'C', label:'C'},
+    {x:0,   y:80,  z:30,  type:'N', label:'N'},
+    {x:-70, y:40,  z:-20, type:'C', label:'C'},
+    {x:-70, y:-40, z:10,  type:'C', label:'C'},
+    {x:120, y:-80, z:40,  type:'O', label:'O'},
+    {x:120, y:80,  z:-30, type:'O', label:'O'},
+    {x:-120,y:80,  z:20,  type:'N', label:'N'},
+    {x:-120,y:-80, z:-30, type:'C', label:'C'},
+    {x:0,   y:-140,z:50,  type:'C', label:'C'},
+    {x:-160,y:120, z:10,  type:'C', label:'CH₃'},
+    {x:-160,y:-120,z:-40, type:'C', label:'CH₃'},
+    {x:0,   y:-190,z:70,  type:'H', label:''},
+  ];
+  const bonds = [
+    [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
+    [1,6],[2,7],[4,8],[5,9],[0,10],
+    [8,11],[9,12],[10,13],
+    [8,9]
+  ];
+  const colors = { N:'#c0704a', C:'#4a7060', O:'#b06040', H:'#9a8a78' };
+  const sizes =  { N:10, C:9, O:11, H:5 };
+
+  function project(ax, ay, az, rx, ry) {
+    // rotate Y
+    const cosY = Math.cos(ry), sinY = Math.sin(ry);
+    let x1 = ax * cosY - az * sinY;
+    let z1 = ax * sinY + az * cosY;
+    let y1 = ay;
+    // rotate X
+    const cosX = Math.cos(rx), sinX = Math.sin(rx);
+    let y2 = y1 * cosX - z1 * sinX;
+    let z2 = y1 * sinX + z1 * cosX;
+    const fov = 480;
+    const scale = fov / (fov + z2 + 160);
+    return { sx: W/2 + x1 * scale, sy: H/2 + y2 * scale, z: z2, scale };
+  }
+
+  let isDragging = false, lastMX = 0, lastMY = 0;
+  canvas.addEventListener('mousedown', e => { isDragging = true; lastMX = e.clientX; lastMY = e.clientY; });
+  window.addEventListener('mouseup', () => isDragging = false);
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    velX += (e.clientY - lastMY) * 0.008;
+    velY += (e.clientX - lastMX) * 0.008;
+    lastMX = e.clientX; lastMY = e.clientY;
+  });
+
+  let hovered = -1;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    const px = e.clientX - r.left, py = e.clientY - r.top;
+    hovered = -1;
+    atoms.forEach((a, i) => {
+      const p = project(a.x, a.y, a.z, rotX, rotY);
+      const d = Math.hypot(px - p.sx, py - p.sy);
+      if (d < 18) hovered = i;
+    });
+  });
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    if (!isDragging) {
+      const tx = (mouseX / W - 0.5) * 0.6;
+      const ty = (mouseY / H - 0.5) * 0.6;
+      velX += (ty - rotX) * 0.018;
+      velY += (tx - rotY) * 0.018;
+    }
+    velX *= 0.85; velY *= 0.85;
+    rotX += velX; rotY += velY;
+
+    // project all
+    const proj = atoms.map(a => project(a.x, a.y, a.z, rotX, rotY));
+
+    // sort bonds by average Z
+    const sortedBonds = bonds.map(([i,j]) => ({i, j, z: (proj[i].z + proj[j].z)/2})).sort((a,b) => a.z - b.z);
+
+    // draw bonds
+    sortedBonds.forEach(({i,j}) => {
+      const p1 = proj[i], p2 = proj[j];
+      const alpha = 0.18 + (p1.z + p2.z + 320) / 1280 * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(p1.sx, p1.sy);
+      ctx.lineTo(p2.sx, p2.sy);
+      ctx.strokeStyle = `rgba(90,70,50,${alpha})`;
+      ctx.lineWidth = 1.5 * ((p1.scale + p2.scale) / 2);
+      ctx.stroke();
+    });
+
+    // draw atoms back-to-front
+    const sorted = proj.map((p,i) => ({...p, i})).sort((a,b) => a.z - b.z);
+    sorted.forEach(({sx, sy, z, scale, i}) => {
+      const a = atoms[i];
+      const r = sizes[a.type] * scale;
+      const isHov = hovered === i;
+      const depth = (z + 320) / 640;
+      const baseAlpha = 0.5 + depth * 0.5;
+
+      // shadow
+      ctx.beginPath();
+      ctx.arc(sx + 2*scale, sy + 2*scale, r * 1.1, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(26,21,16,${0.08 * baseAlpha})`;
+      ctx.fill();
+
+      // atom
+      ctx.beginPath();
+      ctx.arc(sx, sy, isHov ? r * 1.5 : r, 0, Math.PI*2);
+      const grad = ctx.createRadialGradient(sx - r*0.3, sy - r*0.3, 0, sx, sy, r * (isHov ? 1.5 : 1));
+      const col = colors[a.type];
+      grad.addColorStop(0, col + 'ff');
+      grad.addColorStop(1, col + '88');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // label
+      if (a.label && (a.type !== 'C' || isHov)) {
+        ctx.font = `${Math.max(9, 11 * scale)}px DM Mono, monospace`;
+        ctx.fillStyle = `rgba(26,21,16,${0.7 * baseAlpha})`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(a.label, sx, sy);
+      }
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── SKILL CONSTELLATION ── */
+(function() {
+  const wrap = document.getElementById('skill-canvas-wrap');
+  const canvas = document.getElementById('skill-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize() {
+    W = canvas.width = wrap.offsetWidth;
+    H = canvas.height = wrap.offsetHeight;
+    initNodes();
+  }
+
+  const skillData = [
+    // AI/ML (terra)
+    {label:'Python',     cat:0, mass:1.6},
+    {label:'TensorFlow', cat:0, mass:1.3},
+    {label:'PyTorch',    cat:0, mass:1.3},
+    {label:'Keras',      cat:0, mass:1.1},
+    {label:'Scikit-learn',cat:0,mass:1.2},
+    {label:'OpenCV',     cat:0, mass:1.0},
+    {label:'CNN',        cat:0, mass:1.4},
+    // Bioinformatics (sage)
+    {label:'NGS',        cat:1, mass:1.5},
+    {label:'Scanpy',     cat:1, mass:1.2},
+    {label:'FreeBayes',  cat:1, mass:1.0},
+    {label:'BLAST',      cat:1, mass:1.1},
+    {label:'Clustal Ω', cat:1, mass:1.0},
+    {label:'Galaxy',     cat:1, mass:1.0},
+    {label:'RNA-seq',    cat:1, mass:1.3},
+    // Data Science (slate)
+    {label:'pandas',     cat:2, mass:1.2},
+    {label:'NumPy',      cat:2, mass:1.2},
+    {label:'Matplotlib', cat:2, mass:1.0},
+    {label:'SciPy',      cat:2, mass:1.0},
+    {label:'SAS',        cat:2, mass:1.0},
+    {label:'SQL',        cat:2, mass:1.0},
+    {label:'Stata',      cat:2, mass:0.9},
+    // Lab/Eng (amber)
+    {label:'PCR',        cat:3, mass:1.1},
+    {label:'Cell Culture',cat:3,mass:1.0},
+    {label:'MATLAB',     cat:3, mass:1.1},
+    {label:'ANSYS',      cat:3, mass:1.0},
+    {label:'gPROMS',     cat:3, mass:1.0},
+    {label:'Microfluidics',cat:3,mass:1.1},
+  ];
+
+  const catColors = ['#c0704a','#5a8a6a','#4a6a8a','#c09040'];
+  let nodes = [];
+  let dragging = null, dragOffX = 0, dragOffY = 0;
+  let hov = -1;
+
+  function initNodes() {
+    nodes = skillData.map((s, i) => ({
+      ...s,
+      x: W * 0.1 + Math.random() * W * 0.8,
+      y: H * 0.1 + Math.random() * H * 0.8,
+      vx: (Math.random()-0.5)*0.5,
+      vy: (Math.random()-0.5)*0.5,
+      r: 18 + s.mass * 8,
+    }));
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    if (dragging !== null) {
+      nodes[dragging].x = mx + dragOffX;
+      nodes[dragging].y = my + dragOffY;
+      nodes[dragging].vx = 0; nodes[dragging].vy = 0;
+    }
+    hov = -1;
+    nodes.forEach((n, i) => { if (Math.hypot(mx-n.x, my-n.y) < n.r) hov = i; });
+  });
+
+  canvas.addEventListener('mousedown', e => {
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    nodes.forEach((n, i) => {
+      if (Math.hypot(mx-n.x, my-n.y) < n.r) {
+        dragging = i; dragOffX = n.x - mx; dragOffY = n.y - my;
+      }
+    });
+  });
+  window.addEventListener('mouseup', () => { dragging = null; });
+
+  function simStep() {
+    nodes.forEach((n, i) => {
+      if (dragging === i) return;
+      // repulsion
+      nodes.forEach((m, j) => {
+        if (i === j) return;
+        const dx = n.x - m.x, dy = n.y - m.y;
+        const dist = Math.max(Math.hypot(dx, dy), 1);
+        const force = 1800 / (dist * dist);
+        n.vx += (dx / dist) * force * 0.01;
+        n.vy += (dy / dist) * force * 0.01;
+      });
+      // center attraction
+      n.vx += (W/2 - n.x) * 0.0008;
+      n.vy += (H/2 - n.y) * 0.0008;
+      // category clustering
+      const catCX = [W*0.28, W*0.72, W*0.28, W*0.72];
+      const catCY = [H*0.3, H*0.3, H*0.7, H*0.7];
+      n.vx += (catCX[n.cat] - n.x) * 0.0015;
+      n.vy += (catCY[n.cat] - n.y) * 0.0015;
+
+      n.vx *= 0.88; n.vy *= 0.88;
+      n.x += n.vx; n.y += n.vy;
+      n.x = Math.max(n.r, Math.min(W - n.r, n.x));
+      n.y = Math.max(n.r, Math.min(H - n.r, n.y));
+    });
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // connections within same category
+    nodes.forEach((n, i) => {
+      nodes.forEach((m, j) => {
+        if (j <= i || n.cat !== m.cat) return;
+        const d = Math.hypot(n.x-m.x, n.y-m.y);
+        if (d > 200) return;
+        const alpha = (1 - d/200) * 0.25;
+        ctx.beginPath();
+        ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y);
+        ctx.strokeStyle = catColors[n.cat] + Math.round(alpha*255).toString(16).padStart(2,'0');
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+    });
+
+    // nodes
+    nodes.forEach((n, i) => {
+      const isH = hov === i;
+      const r = isH ? n.r * 1.25 : n.r;
+      const col = catColors[n.cat];
+
+      // glow
+      if (isH) {
+        ctx.beginPath(); ctx.arc(n.x, n.y, r * 1.6, 0, Math.PI*2);
+        ctx.fillStyle = col + '22';
+        ctx.fill();
+      }
+
+      // circle
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2);
+      ctx.fillStyle = col + (isH ? 'ff' : '22');
+      ctx.fill();
+      ctx.strokeStyle = col + (isH ? 'ff' : '88');
+      ctx.lineWidth = isH ? 2 : 1;
+      ctx.stroke();
+
+      // label
+      ctx.font = `${isH ? 500 : 400} ${Math.max(10, 11 + (n.mass-1)*2)}px DM Sans, sans-serif`;
+      ctx.fillStyle = isH ? col : '#3d3328';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(n.label, n.x, n.y);
+    });
+
+    simStep();
+    requestAnimationFrame(drawFrame);
+  }
+  drawFrame();
+})();
+
+/* ── MAGNETIC BUTTONS ── */
+document.querySelectorAll('.btn-mag').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const r = btn.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width/2;
+    const y = e.clientY - r.top - r.height/2;
+    btn.style.transform = `translate(${x*0.18}px, ${y*0.18}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+  });
+});
+</script>
+</body>
+</html>
