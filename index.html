@@ -1002,7 +1002,13 @@ function typeLoop() {
   } else {
     target.innerHTML = phrase.slice(0, ci) + '<span class="type-cursor"></span>';
     ci--;
-    if (ci < 0) { del = false; pi = (pi + 1) % phrases.length; setTimeout(typeLoop, 300); return; }
+    if (ci < 0) {
+      del = false;
+      pi = (pi + 1) % phrases.length;
+      window.dispatchEvent(new CustomEvent('heroScene', { detail: pi }));
+      setTimeout(typeLoop, 300);
+      return;
+    }
     setTimeout(typeLoop, 22);
   }
 }
@@ -1037,148 +1043,470 @@ const tlObs = new IntersectionObserver(entries => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDelay = i * 0.08 + 's'; tlObs.observe(el); });
 
-/* ── MOLECULE CANVAS ── */
+/* ── ADAPTIVE HERO VISUALIZATION ── */
+/* Single particle system that morphs between 4 scenes, each tied to a typing phrase:
+   0  Neural network  → "Building AI pipelines for cancer prognosis"
+   1  DNA double helix → "Developing NGS workflows for genomic analysis"
+   2  Cell + neural hybrid → "Merging deep learning with life sciences"
+   3  Circuit / data flow → "Engineering precision diagnostic systems"
+*/
 (function() {
   const canvas = document.getElementById('mol-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  let mouseX = W/2, mouseY = H/2;
-  let rotX = 0.3, rotY = 0.2, velX = 0, velY = 0;
+  const CX = W / 2, CY = H / 2;
 
-  canvas.addEventListener('mousemove', e => {
-    const r = canvas.getBoundingClientRect();
-    mouseX = e.clientX - r.left;
-    mouseY = e.clientY - r.top;
-  });
+  // ── palette (matches CSS tokens) ──
+  const TERRA = [192, 112, 74];
+  const AMBER = [196, 154, 74];
+  const SAGE  = [90, 138, 106];
+  const SLATE = [74, 106, 138];
+  const INK   = [26, 21, 16];
+  const INK2  = [61, 51, 40];
+  const INK3  = [122, 106, 88];
+  const rgba  = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
-  // Build molecule (caffeine-like structure)
-  const atoms = [
-    {x:0,   y:-80, z:0,   type:'N', label:'N'},
-    {x:70,  y:-40, z:20,  type:'C', label:'C'},
-    {x:70,  y:40,  z:-10, type:'C', label:'C'},
-    {x:0,   y:80,  z:30,  type:'N', label:'N'},
-    {x:-70, y:40,  z:-20, type:'C', label:'C'},
-    {x:-70, y:-40, z:10,  type:'C', label:'C'},
-    {x:120, y:-80, z:40,  type:'O', label:'O'},
-    {x:120, y:80,  z:-30, type:'O', label:'O'},
-    {x:-120,y:80,  z:20,  type:'N', label:'N'},
-    {x:-120,y:-80, z:-30, type:'C', label:'C'},
-    {x:0,   y:-140,z:50,  type:'C', label:'C'},
-    {x:-160,y:120, z:10,  type:'C', label:'CH₃'},
-    {x:-160,y:-120,z:-40, type:'C', label:'CH₃'},
-    {x:0,   y:-190,z:70,  type:'H', label:''},
-  ];
-  const bonds = [
-    [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
-    [1,6],[2,7],[4,8],[5,9],[0,10],
-    [8,11],[9,12],[10,13],
-    [8,9]
-  ];
-  const colors = { N:'#c0704a', C:'#4a7060', O:'#b06040', H:'#9a8a78' };
-  const sizes =  { N:10, C:9, O:11, H:5 };
-
-  function project(ax, ay, az, rx, ry) {
-    // rotate Y
-    const cosY = Math.cos(ry), sinY = Math.sin(ry);
-    let x1 = ax * cosY - az * sinY;
-    let z1 = ax * sinY + az * cosY;
-    let y1 = ay;
-    // rotate X
-    const cosX = Math.cos(rx), sinX = Math.sin(rx);
-    let y2 = y1 * cosX - z1 * sinX;
-    let z2 = y1 * sinX + z1 * cosX;
-    const fov = 480;
-    const scale = fov / (fov + z2 + 160);
-    return { sx: W/2 + x1 * scale, sy: H/2 + y2 * scale, z: z2, scale };
+  // ── particle pool ──
+  const N = 84;
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: CX, y: CY, tx: CX, ty: CY,
+      lerp: 0.045 + Math.random() * 0.04,
+      role: '', data: {},
+      size: 3, color: INK2,
+      phase: Math.random() * Math.PI * 2,
+      pulse: 0.5 + Math.random() * 0.5,
+    });
   }
 
-  let isDragging = false, lastMX = 0, lastMY = 0;
-  canvas.addEventListener('mousedown', e => { isDragging = true; lastMX = e.clientX; lastMY = e.clientY; });
-  window.addEventListener('mouseup', () => isDragging = false);
-  window.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    velX += (e.clientY - lastMY) * 0.008;
-    velY += (e.clientX - lastMX) * 0.008;
-    lastMX = e.clientX; lastMY = e.clientY;
-  });
+  let currentScene = 0, frame = 0;
+  const overlayA = [0, 0, 0, 0];
 
-  let hovered = -1;
+  // mouse parallax
+  let mx = CX, my = CY, parX = 0, parY = 0;
   canvas.addEventListener('mousemove', e => {
     const r = canvas.getBoundingClientRect();
-    const px = e.clientX - r.left, py = e.clientY - r.top;
-    hovered = -1;
-    atoms.forEach((a, i) => {
-      const p = project(a.x, a.y, a.z, rotX, rotY);
-      const d = Math.hypot(px - p.sx, py - p.sy);
-      if (d < 18) hovered = i;
-    });
+    mx = e.clientX - r.left; my = e.clientY - r.top;
   });
+  canvas.addEventListener('mouseleave', () => { mx = CX; my = CY; });
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  /* ─────────────── SCENE 0 — NEURAL NETWORK ─────────────── */
+  const NN_LAYERS = [4, 6, 6, 3];
+  const NN_X = NN_LAYERS.map((_, i) => 70 + i * (W - 140) / (NN_LAYERS.length - 1));
+  const nnY = (li, ni) => CY - (NN_LAYERS[li] - 1) * 26 + ni * 52;
 
-    if (!isDragging) {
-      const tx = (mouseX / W - 0.5) * 0.6;
-      const ty = (mouseY / H - 0.5) * 0.6;
-      velX += (ty - rotX) * 0.018;
-      velY += (tx - rotY) * 0.018;
+  function assignNNPacket(d) {
+    d.li = Math.floor(Math.random() * (NN_LAYERS.length - 1));
+    d.fromN = Math.floor(Math.random() * NN_LAYERS[d.li]);
+    d.toN = Math.floor(Math.random() * NN_LAYERS[d.li + 1]);
+  }
+  function setNeural() {
+    let p = 0;
+    for (let li = 0; li < NN_LAYERS.length; li++) {
+      for (let ni = 0; ni < NN_LAYERS[li]; ni++) {
+        const part = particles[p++];
+        part.tx = NN_X[li]; part.ty = nnY(li, ni);
+        part.role = 'nn-node'; part.data = { li, ni };
+        part.size = (li === 0 || li === NN_LAYERS.length - 1) ? 6 : 5;
+        part.color = li === NN_LAYERS.length - 1 ? TERRA :
+                     li === 0 ? INK2 : SLATE;
+      }
     }
-    velX *= 0.85; velY *= 0.85;
-    rotX += velX; rotY += velY;
-
-    // project all
-    const proj = atoms.map(a => project(a.x, a.y, a.z, rotX, rotY));
-
-    // sort bonds by average Z
-    const sortedBonds = bonds.map(([i,j]) => ({i, j, z: (proj[i].z + proj[j].z)/2})).sort((a,b) => a.z - b.z);
-
-    // draw bonds
-    sortedBonds.forEach(({i,j}) => {
-      const p1 = proj[i], p2 = proj[j];
-      const alpha = 0.18 + (p1.z + p2.z + 320) / 1280 * 0.5;
-      ctx.beginPath();
-      ctx.moveTo(p1.sx, p1.sy);
-      ctx.lineTo(p2.sx, p2.sy);
-      ctx.strokeStyle = `rgba(90,70,50,${alpha})`;
-      ctx.lineWidth = 1.5 * ((p1.scale + p2.scale) / 2);
-      ctx.stroke();
+    while (p < N) {
+      const part = particles[p++];
+      part.role = 'nn-pkt';
+      part.data = { t: Math.random(), speed: 0.004 + Math.random() * 0.006 };
+      assignNNPacket(part.data);
+      part.size = 1.6; part.color = TERRA;
+    }
+  }
+  function updateNeural() {
+    particles.forEach(p => {
+      if (p.role !== 'nn-pkt') return;
+      p.data.t += p.data.speed;
+      if (p.data.t > 1) { p.data.t = 0; assignNNPacket(p.data); }
+      const t = p.data.t;
+      const x1 = NN_X[p.data.li], x2 = NN_X[p.data.li + 1];
+      const y1 = nnY(p.data.li, p.data.fromN);
+      const y2 = nnY(p.data.li + 1, p.data.toN);
+      p.tx = x1 + (x2 - x1) * t;
+      p.ty = y1 + (y2 - y1) * t;
     });
-
-    // draw atoms back-to-front
-    const sorted = proj.map((p,i) => ({...p, i})).sort((a,b) => a.z - b.z);
-    sorted.forEach(({sx, sy, z, scale, i}) => {
-      const a = atoms[i];
-      const r = sizes[a.type] * scale;
-      const isHov = hovered === i;
-      const depth = (z + 320) / 640;
-      const baseAlpha = 0.5 + depth * 0.5;
-
-      // shadow
+  }
+  function drawNN(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    // dense connections
+    for (let li = 0; li < NN_LAYERS.length - 1; li++) {
+      for (let i = 0; i < NN_LAYERS[li]; i++) {
+        for (let j = 0; j < NN_LAYERS[li + 1]; j++) {
+          const seed = (li * 97 + i * 31 + j * 17) % 100;
+          const w = 0.06 + (seed / 100) * 0.16;
+          ctx.beginPath();
+          ctx.moveTo(NN_X[li], nnY(li, i));
+          ctx.lineTo(NN_X[li + 1], nnY(li + 1, j));
+          ctx.strokeStyle = rgba(INK2, w);
+          ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+    }
+    // dashed layer rules
+    NN_X.forEach((x, li) => {
+      const c = NN_LAYERS[li];
       ctx.beginPath();
-      ctx.arc(sx + 2*scale, sy + 2*scale, r * 1.1, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(26,21,16,${0.08 * baseAlpha})`;
-      ctx.fill();
+      ctx.moveTo(x, nnY(li, 0) - 32);
+      ctx.lineTo(x, nnY(li, c - 1) + 32);
+      ctx.strokeStyle = rgba(INK3, 0.1);
+      ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
+      ctx.stroke(); ctx.setLineDash([]);
+    });
+    // layer labels
+    const labels = ['INPUT', 'HIDDEN', 'HIDDEN', 'OUTPUT'];
+    ctx.font = '8px DM Mono, monospace';
+    ctx.fillStyle = rgba(INK3, 0.55);
+    ctx.textAlign = 'center';
+    NN_X.forEach((x, li) => {
+      ctx.fillText(labels[li], x, nnY(li, NN_LAYERS[li] - 1) + 50);
+    });
+    ctx.restore();
+  }
 
-      // atom
-      ctx.beginPath();
-      ctx.arc(sx, sy, isHov ? r * 1.5 : r, 0, Math.PI*2);
-      const grad = ctx.createRadialGradient(sx - r*0.3, sy - r*0.3, 0, sx, sy, r * (isHov ? 1.5 : 1));
-      const col = colors[a.type];
-      grad.addColorStop(0, col + 'ff');
-      grad.addColorStop(1, col + '88');
-      ctx.fillStyle = grad;
-      ctx.fill();
+  /* ─────────────── SCENE 1 — DNA DOUBLE HELIX ─────────────── */
+  const DNA_PAIRS = 18;
+  const DNA_TURNS = 2.4;
+  const DNA_R = 88;
+  const DNA_H = 360;
+  const DNA_TOP = CY - DNA_H / 2;
+  const BASES = ['A', 'T', 'G', 'C'];
+  const DNA_PAIR_BASES = [];
+  for (let i = 0; i < DNA_PAIRS; i++) {
+    const a = Math.floor(Math.random() * 4);
+    DNA_PAIR_BASES.push([BASES[a], BASES[a < 2 ? 1 - a : 5 - a]]);
+  }
+  let helixRot = 0;
 
-      // label
-      if (a.label && (a.type !== 'C' || isHov)) {
-        ctx.font = `${Math.max(9, 11 * scale)}px DM Mono, monospace`;
-        ctx.fillStyle = `rgba(26,21,16,${0.7 * baseAlpha})`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(a.label, sx, sy);
+  function setDNA() {
+    let p = 0;
+    for (let i = 0; i < DNA_PAIRS; i++) {
+      const t = i / (DNA_PAIRS - 1);
+      const ba = t * DNA_TURNS * Math.PI * 2;
+      const pA = particles[p++];
+      pA.role = 'dna'; pA.data = { i, strand: 0, ba, depth: 0 };
+      pA.tx = CX + Math.cos(ba + helixRot) * DNA_R;
+      pA.ty = DNA_TOP + t * DNA_H;
+      pA.size = 5; pA.color = SAGE;
+      const pB = particles[p++];
+      pB.role = 'dna'; pB.data = { i, strand: 1, ba, depth: 0 };
+      pB.tx = CX + Math.cos(ba + helixRot + Math.PI) * DNA_R;
+      pB.ty = DNA_TOP + t * DNA_H;
+      pB.size = 5; pB.color = TERRA;
+    }
+    while (p < N) {
+      const part = particles[p++];
+      part.role = 'dna-amb';
+      part.data = {
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.003 + Math.random() * 0.005,
+        side: Math.random() < 0.5 ? -1 : 1,
+        offset: 30 + Math.random() * 80,
+      };
+      part.size = 1.4; part.color = INK3;
+    }
+  }
+  function updateDNA() {
+    helixRot += 0.011;
+    particles.forEach(p => {
+      if (p.role === 'dna') {
+        const t = p.data.i / (DNA_PAIRS - 1);
+        const ang = p.data.ba + helixRot + (p.data.strand === 1 ? Math.PI : 0);
+        p.data.depth = (Math.sin(ang) + 1) / 2;
+        p.tx = CX + Math.cos(ang) * DNA_R;
+        p.ty = DNA_TOP + t * DNA_H;
+        p.size = 3.5 + p.data.depth * 2.5;
+      } else if (p.role === 'dna-amb') {
+        p.data.phase += p.data.speed;
+        const t = ((p.data.phase / (Math.PI * 2)) % 1 + 1) % 1;
+        p.tx = CX + p.data.side * (DNA_R + p.data.offset) + Math.sin(p.data.phase * 1.4) * 8;
+        p.ty = DNA_TOP + t * DNA_H;
       }
     });
+  }
+  function drawDNA(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    const pairs = {};
+    particles.forEach(p => {
+      if (p.role !== 'dna') return;
+      if (!pairs[p.data.i]) pairs[p.data.i] = [null, null];
+      pairs[p.data.i][p.data.strand] = p;
+    });
+    // backbones (smooth strand curves)
+    for (let s = 0; s < 2; s++) {
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i < DNA_PAIRS; i++) {
+        if (!pairs[i] || !pairs[i][s]) continue;
+        const p = pairs[i][s];
+        if (first) { ctx.moveTo(p.x, p.y); first = false; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = rgba(s === 0 ? SAGE : TERRA, 0.55);
+      ctx.lineWidth = 1.6; ctx.stroke();
+    }
+    // base-pair rungs + nucleotide letters
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < DNA_PAIRS; i++) {
+      const pp = pairs[i]; if (!pp || !pp[0] || !pp[1]) continue;
+      const dx = Math.abs(pp[0].x - pp[1].x);
+      const al = 0.12 + (dx / (DNA_R * 2)) * 0.4;
+      ctx.beginPath();
+      ctx.moveTo(pp[0].x, pp[0].y);
+      ctx.lineTo(pp[1].x, pp[1].y);
+      ctx.strokeStyle = rgba(INK2, al);
+      ctx.lineWidth = 1; ctx.stroke();
+      const bs = DNA_PAIR_BASES[i];
+      ctx.fillStyle = rgba(SAGE, 0.62);
+      ctx.textAlign = pp[0].x > CX ? 'left' : 'right';
+      ctx.fillText(bs[0], pp[0].x + (pp[0].x > CX ? 8 : -8), pp[0].y);
+      ctx.fillStyle = rgba(TERRA, 0.62);
+      ctx.textAlign = pp[1].x > CX ? 'left' : 'right';
+      ctx.fillText(bs[1], pp[1].x + (pp[1].x > CX ? 8 : -8), pp[1].y);
+    }
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE 2 — CELL + NEURAL HYBRID ─────────────── */
+  const CELL_OUT = 40;
+  const CELL_SYN = 30;
+  const synPos = [];
+  for (let i = 0; i < CELL_SYN; i++) {
+    const ang = (i / CELL_SYN) * Math.PI * 2 + (i % 3) * 0.7;
+    const r = 28 + (i % 4) * 22 + Math.sin(i * 1.7) * 8;
+    synPos.push({ x: CX + Math.cos(ang) * r, y: CY + Math.sin(ang) * r * 0.92 });
+  }
+  const synLinks = [];
+  for (let i = 0; i < CELL_SYN; i++) {
+    const dists = [];
+    for (let j = 0; j < CELL_SYN; j++) {
+      if (i === j) continue;
+      dists.push([j, Math.hypot(synPos[i].x - synPos[j].x, synPos[i].y - synPos[j].y)]);
+    }
+    dists.sort((a, b) => a[1] - b[1]);
+    dists.slice(0, 2).forEach(([j]) => { if (i < j) synLinks.push([i, j]); });
+  }
+  function cellOutline(t) {
+    const ang = t * Math.PI * 2;
+    const wob = Math.sin(ang * 3 + 0.5) * 5 + Math.sin(ang * 7) * 2.5;
+    const r = 142 + wob;
+    return { x: CX + Math.cos(ang) * r, y: CY + Math.sin(ang) * r * 0.95 };
+  }
+  function setCell() {
+    let p = 0;
+    for (let i = 0; i < CELL_OUT; i++) {
+      const t = i / CELL_OUT;
+      const pt = cellOutline(t);
+      const part = particles[p++];
+      part.role = 'cell-out'; part.data = { t };
+      part.tx = pt.x; part.ty = pt.y;
+      part.size = 2.4; part.color = TERRA;
+    }
+    for (let i = 0; i < CELL_SYN; i++) {
+      const part = particles[p++];
+      part.role = 'cell-syn'; part.data = { i };
+      part.tx = synPos[i].x; part.ty = synPos[i].y;
+      part.size = 3.4; part.color = SAGE;
+    }
+    while (p < N) {
+      const part = particles[p++];
+      const ang = Math.random() * Math.PI * 2;
+      const r = 145 + Math.random() * 20;
+      part.role = 'cell-amb';
+      part.data = { ang, baseR: r, phase: Math.random() * Math.PI * 2 };
+      part.tx = CX + Math.cos(ang) * r;
+      part.ty = CY + Math.sin(ang) * r * 0.95;
+      part.size = 1.2; part.color = INK3;
+    }
+  }
+  function updateCell() {
+    particles.forEach(p => {
+      if (p.role === 'cell-amb') {
+        p.data.phase += 0.01;
+        const r = p.data.baseR + Math.sin(p.data.phase) * 6;
+        p.tx = CX + Math.cos(p.data.ang) * r;
+        p.ty = CY + Math.sin(p.data.ang) * r * 0.95;
+      }
+    });
+  }
+  function drawCell(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    // membrane outline
+    const out = particles.filter(p => p.role === 'cell-out')
+      .sort((x, y) => x.data.t - y.data.t);
+    if (out.length > 2) {
+      ctx.beginPath();
+      out.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.closePath();
+      ctx.fillStyle = rgba(TERRA, 0.04); ctx.fill();
+      ctx.strokeStyle = rgba(TERRA, 0.5);
+      ctx.lineWidth = 1.3; ctx.stroke();
+    }
+    // synaptic connections + travelling sparks
+    const syn = particles.filter(p => p.role === 'cell-syn')
+      .sort((x, y) => x.data.i - y.data.i);
+    synLinks.forEach(([i, j]) => {
+      if (!syn[i] || !syn[j]) return;
+      const A = syn[i], B = syn[j];
+      const pulse = (Math.sin(frame * 0.03 + i * 0.7) + 1) / 2;
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y);
+      ctx.strokeStyle = rgba(SAGE, 0.18 + pulse * 0.22);
+      ctx.lineWidth = 1; ctx.stroke();
+      const sp = (frame * 0.012 + i * 0.41) % 1;
+      const sx = A.x + (B.x - A.x) * sp;
+      const sy = A.y + (B.y - A.y) * sp;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1.6, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(TERRA, 0.85);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE 3 — CIRCUIT / DATA FLOW ─────────────── */
+  const G = 5;
+  const CELLW = 64;
+  const GX0 = CX - (G - 1) * CELLW / 2;
+  const GY0 = CY - (G - 1) * CELLW / 2;
+  const traces = [];
+  for (let gy = 0; gy < G; gy++) {
+    for (let gx = 0; gx < G; gx++) {
+      const seed = (gx * 31 + gy * 17) % 100;
+      if (gx < G - 1 && seed < 75) traces.push({ a: [gx, gy], b: [gx + 1, gy] });
+      if (gy < G - 1 && ((gx * 17 + gy * 41) % 100) < 70) traces.push({ a: [gx, gy], b: [gx, gy + 1] });
+    }
+  }
+  const gxy = (gx, gy) => ({ x: GX0 + gx * CELLW, y: GY0 + gy * CELLW });
+  function setCircuit() {
+    let p = 0;
+    for (let gy = 0; gy < G; gy++) {
+      for (let gx = 0; gx < G; gx++) {
+        if (p >= N) break;
+        const part = particles[p++];
+        const pt = gxy(gx, gy);
+        part.role = 'cir-chip'; part.data = { gx, gy };
+        part.tx = pt.x; part.ty = pt.y;
+        part.size = 4; part.color = AMBER;
+      }
+    }
+    while (p < N) {
+      const part = particles[p++];
+      part.role = 'cir-pkt';
+      part.data = {
+        tr: traces[Math.floor(Math.random() * traces.length)],
+        t: Math.random(),
+        speed: 0.005 + Math.random() * 0.008,
+      };
+      part.size = 1.5; part.color = TERRA;
+    }
+  }
+  function updateCircuit() {
+    particles.forEach(p => {
+      if (p.role !== 'cir-pkt') return;
+      p.data.t += p.data.speed;
+      if (p.data.t > 1) {
+        p.data.t = 0;
+        p.data.tr = traces[Math.floor(Math.random() * traces.length)];
+      }
+      const a = gxy(p.data.tr.a[0], p.data.tr.a[1]);
+      const b = gxy(p.data.tr.b[0], p.data.tr.b[1]);
+      p.tx = a.x + (b.x - a.x) * p.data.t;
+      p.ty = a.y + (b.y - a.y) * p.data.t;
+    });
+  }
+  function drawCircuit(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    // PCB-like traces
+    traces.forEach(tr => {
+      const A = gxy(tr.a[0], tr.a[1]);
+      const B = gxy(tr.b[0], tr.b[1]);
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y);
+      ctx.strokeStyle = rgba(INK2, 0.22);
+      ctx.lineWidth = 1; ctx.stroke();
+    });
+    // chip housings — gentle clock pulse
+    for (let gy = 0; gy < G; gy++) {
+      for (let gx = 0; gx < G; gx++) {
+        const pt = gxy(gx, gy);
+        const phase = frame * 0.018 + (gx + gy) * 0.4;
+        const pulse = 0.4 + (Math.sin(phase) + 1) / 4;
+        ctx.strokeStyle = rgba(AMBER, pulse * 0.55);
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pt.x - 8, pt.y - 8, 16, 16);
+      }
+    }
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE MANAGEMENT ─────────────── */
+  const SCENE_FNS = [setNeural, setDNA, setCell, setCircuit];
+  function setScene(i) {
+    if (i === currentScene) return;
+    currentScene = i;
+    SCENE_FNS[i]();
+  }
+  setNeural();
+  particles.forEach(p => { p.x = p.tx; p.y = p.ty; });
+  overlayA[0] = 1;
+  window.addEventListener('heroScene', e => setScene(e.detail));
+
+  /* ─────────────── DRAW LOOP ─────────────── */
+  function draw() {
+    frame++;
+    ctx.clearRect(0, 0, W, H);
+    parX += ((mx - CX) * 0.05 - parX) * 0.06;
+    parY += ((my - CY) * 0.05 - parY) * 0.06;
+
+    if (currentScene === 0) updateNeural();
+    else if (currentScene === 1) updateDNA();
+    else if (currentScene === 2) updateCell();
+    else if (currentScene === 3) updateCircuit();
+
+    particles.forEach(p => {
+      p.x += (p.tx - p.x) * p.lerp;
+      p.y += (p.ty - p.y) * p.lerp;
+    });
+    overlayA.forEach((a, i) => {
+      const t = i === currentScene ? 1 : 0;
+      overlayA[i] = a + (t - a) * 0.05;
+    });
+
+    ctx.save();
+    ctx.translate(parX, parY);
+    if (overlayA[0] > 0.01) drawNN(overlayA[0]);
+    if (overlayA[1] > 0.01) drawDNA(overlayA[1]);
+    if (overlayA[2] > 0.01) drawCell(overlayA[2]);
+    if (overlayA[3] > 0.01) drawCircuit(overlayA[3]);
+
+    // particles, sorted by Y for soft depth
+    const sorted = [...particles].sort((a, b) => a.y - b.y);
+    sorted.forEach(p => {
+      const pulse = 1 + Math.sin(frame * 0.045 + p.phase) * 0.13 * p.pulse;
+      const r = p.size * pulse;
+      // shadow
+      ctx.beginPath();
+      ctx.arc(p.x + 1.4, p.y + 1.4, r, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(INK, 0.07); ctx.fill();
+      // body
+      const grad = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, 0, p.x, p.y, r);
+      grad.addColorStop(0, rgba(p.color, 1));
+      grad.addColorStop(1, rgba(p.color, 0.55));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = grad; ctx.fill();
+    });
+    ctx.restore();
 
     requestAnimationFrame(draw);
   }
