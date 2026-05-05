@@ -7,28 +7,50 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #1a1510;
-  --ink2: #3d3328;
-  --ink3: #7a6a58;
-  --paper: #f5f0e8;
+  --ink:    #1a1510;
+  --ink2:   #3d3328;
+  --ink3:   #7a6a58;
+  --paper:  #f5f0e8;
   --paper2: #ede6d6;
   --paper3: #e4daca;
-  --terra: oklch(62% 0.14 42);
-  --amber: oklch(72% 0.16 72);
-  --sage: oklch(58% 0.10 155);
-  --slate: oklch(42% 0.06 230);
+  --terra:  oklch(62% 0.14 42);
+  --amber:  oklch(72% 0.16 72);
+  --sage:   oklch(58% 0.10 155);
+  --slate:  oklch(42% 0.06 230);
   --f-display: 'Fraunces', serif;
-  --f-body: 'DM Sans', sans-serif;
-  --f-mono: 'DM Mono', monospace;
+  --f-body:    'DM Sans', sans-serif;
+  --f-mono:    'DM Mono', monospace;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+
 body {
   font-family: var(--f-body);
   background: var(--paper);
   color: var(--ink);
   overflow-x: hidden;
+  cursor: none;
 }
+
+/* ── CURSOR ── */
+#cursor {
+  position: fixed; z-index: 9999; pointer-events: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--terra);
+  transform: translate(-50%,-50%);
+  transition: width .2s, height .2s, opacity .2s;
+  mix-blend-mode: multiply;
+}
+#cursor-ring {
+  position: fixed; z-index: 9998; pointer-events: none;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--terra);
+  transform: translate(-50%,-50%);
+  transition: all .12s ease-out;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+body:hover #cursor { opacity: 1; }
 
 /* ── NAV ── */
 nav {
@@ -106,7 +128,6 @@ nav.scrolled {
   font-size: 16px; line-height: 1.75;
   color: var(--ink2); max-width: 440px;
   margin-bottom: 48px;
-  min-height: 56px;
   opacity: 0; animation: slideRight .8s .4s forwards;
 }
 .hero-cta {
@@ -119,7 +140,7 @@ nav.scrolled {
   font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
   text-decoration: none; text-transform: uppercase;
   position: relative; overflow: hidden;
-  transition: color .3s, transform .3s;
+  transition: color .3s;
 }
 .btn-mag::before {
   content: '';
@@ -141,11 +162,17 @@ nav.scrolled {
 }
 .btn-mag span { position: relative; z-index: 1; }
 
+/* hero right — molecule canvas */
 .hero-right {
   display: flex; justify-content: center; align-items: center;
   position: relative;
 }
-#mol-canvas { width: 460px; height: 460px; }
+#mol-canvas {
+  width: 460px; height: 460px;
+  cursor: none;
+}
+
+/* hero bg grain */
 #hero::before {
   content: '';
   position: absolute; inset: 0; z-index: 0;
@@ -153,6 +180,8 @@ nav.scrolled {
     radial-gradient(ellipse 70% 60% at 80% 40%, rgba(180,120,60,.08) 0%, transparent 70%),
     radial-gradient(ellipse 50% 50% at 20% 80%, rgba(80,120,80,.05) 0%, transparent 70%);
 }
+
+/* large BG number */
 .hero-index {
   position: absolute; right: 48px; bottom: 40px;
   font-family: var(--f-display); font-size: 200px; font-weight: 900;
@@ -161,7 +190,7 @@ nav.scrolled {
   letter-spacing: -0.05em;
 }
 
-/* ── MARQUEE ── */
+/* ── MARQUEE STRIP ── */
 .marquee-wrap {
   border-top: 1px solid rgba(26,21,16,0.1);
   border-bottom: 1px solid rgba(26,21,16,0.1);
@@ -180,10 +209,12 @@ nav.scrolled {
   padding: 0 32px;
   display: flex; align-items: center; gap: 32px;
 }
-.marquee-item::after { content: '✦'; color: var(--terra); font-size: 8px; }
+.marquee-item::after {
+  content: '✦'; color: var(--terra); font-size: 8px;
+}
 @keyframes marquee {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to   { transform: translateX(-50%); }
 }
 
 /* ── SECTION LAYOUT ── */
@@ -192,6 +223,7 @@ nav.scrolled {
   position: relative;
 }
 .section-wrap.alt { background: var(--paper2); }
+
 .section-header {
   display: flex; align-items: baseline; gap: 24px;
   margin-bottom: 64px;
@@ -221,6 +253,7 @@ nav.scrolled {
   background: var(--paper3);
   padding: 40px 32px;
   transition: background .3s;
+  cursor: default;
 }
 .stat-block:hover { background: var(--ink); }
 .stat-block:hover .stat-n { color: var(--amber); }
@@ -249,6 +282,7 @@ nav.scrolled {
   overflow: hidden;
   background: var(--paper);
   transition: transform .4s cubic-bezier(.34,1.2,.64,1), box-shadow .4s;
+  cursor: default;
 }
 .ach-panel::before {
   content: '';
@@ -315,11 +349,14 @@ nav.scrolled {
   font-weight: 700; line-height: 1.35; margin-bottom: 20px;
   color: var(--paper);
 }
-.pub-meta { font-size: 13px; color: rgba(245,240,232,.62); line-height: 1.6; }
-.pub-journal { font-family: var(--f-mono); font-size: 12px; color: var(--amber); margin-top: 12px; line-height: 1.7; }
+.pub-meta { font-size: 13px; color: rgba(245,240,232,.5); line-height: 1.6; }
+.pub-journal { font-family: var(--f-mono); font-size: 12px; color: var(--amber); margin-top: 12px; }
 
 /* ── EXPERIENCE TIMELINE ── */
-.tl-wrap { position: relative; padding-left: 0; }
+.tl-wrap {
+  position: relative;
+  padding-left: 0;
+}
 .tl-item {
   display: grid;
   grid-template-columns: 140px 1px 1fr;
@@ -329,25 +366,37 @@ nav.scrolled {
   transition: opacity .6s, transform .6s;
 }
 .tl-item.visible { opacity: 1; transform: translateY(0); }
-.tl-date-col { text-align: right; padding: 32px 0; }
+
+.tl-date-col {
+  text-align: right;
+  padding: 32px 0;
+}
 .tl-date {
   font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.08em; color: var(--terra);
   text-transform: uppercase;
 }
-.tl-line-col { display: flex; flex-direction: column; align-items: center; }
+.tl-line-col {
+  display: flex; flex-direction: column; align-items: center;
+}
 .tl-line-top, .tl-line-bot {
   flex: 1; width: 1px;
   background: rgba(26,21,16,.15);
 }
-.tl-dot-wrap { width: 12px; height: 12px; flex-shrink: 0; margin: 8px -5.5px; }
+.tl-dot-wrap {
+  width: 12px; height: 12px; flex-shrink: 0;
+  margin: 8px -5.5px;
+}
 .tl-dot {
   width: 12px; height: 12px; border-radius: 50%;
   border: 2px solid var(--terra);
   background: var(--paper);
   transition: background .3s, transform .3s;
 }
-.tl-item:hover .tl-dot { background: var(--terra); transform: scale(1.4); }
+.tl-item:hover .tl-dot {
+  background: var(--terra);
+  transform: scale(1.4);
+}
 .tl-content {
   padding: 32px 0 32px 0;
   border-bottom: 1px solid rgba(26,21,16,.07);
@@ -358,8 +407,13 @@ nav.scrolled {
   font-weight: 700; letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
-.tl-org { font-size: 13px; color: var(--ink3); margin-bottom: 16px; font-style: italic; }
-.tl-bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.tl-org {
+  font-size: 13px; color: var(--ink3);
+  margin-bottom: 16px; font-style: italic;
+}
+.tl-bullets {
+  list-style: none; display: flex; flex-direction: column; gap: 7px;
+}
 .tl-bullets li {
   font-size: 14px; color: var(--ink2); line-height: 1.65;
   padding-left: 18px; position: relative;
@@ -405,6 +459,7 @@ nav.scrolled {
   position: relative;
   overflow: hidden;
   transition: transform .35s cubic-bezier(.34,1.2,.64,1), box-shadow .35s;
+  cursor: default;
 }
 .edu-card:hover {
   transform: translateY(-5px);
@@ -419,7 +474,10 @@ nav.scrolled {
   font-family: var(--f-display); font-size: 18px;
   font-weight: 700; margin-bottom: 6px; line-height: 1.3;
 }
-.edu-school { font-size: 13px; color: var(--ink3); font-style: italic; margin-bottom: 10px; }
+.edu-school {
+  font-size: 13px; color: var(--ink3);
+  font-style: italic; margin-bottom: 10px;
+}
 .edu-focus { font-size: 12px; color: var(--ink3); line-height: 1.6; }
 .edu-num {
   position: absolute; bottom: 16px; right: 20px;
@@ -428,7 +486,9 @@ nav.scrolled {
 }
 
 /* ── CERTIFICATIONS ── */
-.cert-flex { display: flex; flex-wrap: wrap; gap: 10px; }
+.cert-flex {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
 .cert-chip {
   padding: 10px 18px;
   border: 1px solid rgba(26,21,16,.12);
@@ -436,6 +496,7 @@ nav.scrolled {
   font-size: 12px; color: var(--ink2);
   background: var(--paper);
   transition: all .25s;
+  cursor: default;
   position: relative; overflow: hidden;
 }
 .cert-chip::before {
@@ -465,6 +526,7 @@ nav.scrolled {
   background: var(--paper3);
   border-radius: 2px;
   transition: background .3s, transform .3s;
+  cursor: default;
 }
 .lang-pill:hover { background: var(--ink); transform: translateY(-4px); }
 .lang-pill:hover .lang-name { color: var(--paper); }
@@ -493,15 +555,20 @@ nav.scrolled {
 .contact-sub {
   font-size: 15px; color: rgba(245,240,232,.5); line-height: 1.7; max-width: 360px;
 }
-.contact-links { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; }
+.contact-links {
+  display: flex; flex-direction: column; gap: 2px;
+  padding-top: 8px;
+}
 .contact-link {
   display: flex; justify-content: space-between; align-items: center;
   padding: 22px 0;
   border-bottom: 1px solid rgba(245,240,232,.1);
   text-decoration: none; color: var(--paper);
   transition: padding-left .3s, color .3s;
+  group: true;
 }
 .contact-link:hover { padding-left: 12px; color: var(--amber); }
+.contact-link:hover .contact-arrow { transform: translateX(6px) rotate(-45deg); }
 .contact-link-label {
   font-family: var(--f-display); font-size: 22px;
   font-weight: 700;
@@ -510,8 +577,11 @@ nav.scrolled {
   font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.06em; color: rgba(245,240,232,.4);
 }
-.contact-arrow { font-size: 18px; opacity: 0.4; transition: transform .3s, opacity .3s; }
-.contact-link:hover .contact-arrow { transform: translateX(6px) rotate(-45deg); opacity: 1; }
+.contact-arrow {
+  font-size: 18px; opacity: 0.4;
+  transition: transform .3s, opacity .3s;
+}
+.contact-link:hover .contact-arrow { opacity: 1; }
 
 /* ── FOOTER ── */
 footer {
@@ -519,11 +589,10 @@ footer {
   padding: 24px 48px;
   display: flex; justify-content: space-between; align-items: center;
 }
-footer span, footer a {
+footer span {
   font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.08em; color: rgba(245,240,232,.3);
   text-transform: uppercase;
-  text-decoration: none;
 }
 
 /* ── SCROLLBAR ── */
@@ -534,19 +603,23 @@ footer span, footer a {
 /* ── ANIMATIONS ── */
 @keyframes slideRight {
   from { opacity:0; transform: translateX(-24px); }
-  to { opacity:1; transform: translateX(0); }
+  to   { opacity:1; transform: translateX(0); }
 }
 .reveal {
   opacity: 0; transform: translateY(28px);
   transition: opacity .7s, transform .7s;
 }
 .reveal.visible { opacity:1; transform: translateY(0); }
+
+/* ── TYPING CURSOR ── */
 .type-cursor {
   display: inline-block; width: 2px; height: 1em;
   background: var(--terra); vertical-align: text-bottom;
   animation: blink .8s step-end infinite;
   margin-left: 2px;
 }
+
+/* page progress bar */
 #progress {
   position: fixed; top: 0; left: 0; z-index: 9000;
   height: 3px; background: var(--terra);
@@ -559,25 +632,24 @@ footer span, footer a {
   .stats-row { grid-template-columns: repeat(2,1fr); }
   .ach-grid { grid-template-columns: 1fr; }
   .edu-grid { grid-template-columns: 1fr; }
-  .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+  .contact-grid { grid-template-columns: 1fr; }
   .section-wrap { padding: 70px 24px; }
   nav { padding: 16px 24px; }
-  .nav-links { display: none; }
   .tl-item { grid-template-columns: 90px 1px 1fr; gap: 0 16px; }
-  footer { padding: 24px; flex-direction: column; gap: 10px; align-items: flex-start; }
 }
 </style>
 </head>
 <body>
 
 <div id="progress"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
 <!-- NAV -->
 <nav id="nav">
   <a href="#hero" class="nav-logo">RB</a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
-    <li><a href="#publication">Publication</a></li>
     <li><a href="#experience">Work</a></li>
     <li><a href="#skills">Skills</a></li>
     <li><a href="#education">Education</a></li>
@@ -593,7 +665,8 @@ footer span, footer a {
     <p class="hero-desc" id="hero-type-target"></p>
     <div class="hero-cta">
       <a href="https://linkedin.com/in/ramibabas" target="_blank" class="btn-mag btn-solid"><span>LinkedIn</span></a>
-      <a href="mailto:babas.rami@gmail.com" class="btn-mag btn-outline"><span>Email Me</span></a>
+      <a href="/cdn-cgi/l/email-protection#086a696a697b267a696561486f65696164266b6765" class="btn-mag btn-outline"><span>Email Me</span></a>
+
     </div>
   </div>
   <div class="hero-right">
@@ -635,8 +708,8 @@ footer span, footer a {
     </div>
     <div class="ach-panel">
       <div class="ach-num" style="color:var(--sage)">Accepted</div>
-      <div class="ach-title">Cancer Prognosis Publication</div>
-      <div class="ach-body">Integrative survival prediction in breast cancer using ECM protease transcript signatures and clinical variables — accepted in <em>Cancers</em> (MDPI) on 05 May 2026.</div>
+<div class="ach-title">Cancer Prognosis Publication</div>
+<div class="ach-body">Integrative survival prediction in breast cancer using ECM protease signatures — accepted in <em>Cancers</em> (MDPI), May 2026. Impact Factor 4.4 · CiteScore 8.8 · Indexed in PubMed.</div>
       <span class="ach-tag" style="color:var(--sage);border-color:var(--sage)">Publication</span>
     </div>
     <div class="ach-panel">
@@ -655,7 +728,7 @@ footer span, footer a {
 </div>
 
 <!-- PUBLICATION -->
-<div class="section-wrap alt" id="publication">
+<div class="section-wrap alt">
   <div class="section-header reveal">
     <span class="section-num">03</span>
     <h2 class="section-title">Publi<em>cation</em></h2>
@@ -664,11 +737,9 @@ footer span, footer a {
   <div class="pub-block reveal">
     <div class="pub-status">Accepted — Cancers (MDPI)</div>
     <div class="pub-title-text">Integrative Survival Prediction in Breast Cancer Using Extracellular Matrix Protease Transcript Signatures and Clinical Variables: A Machine Learning Approach</div>
-    <div class="pub-meta">
-      Rami Babas · Demitrios H. Vynios · Aristotelis Kompothrekas · Basilis Boutsinas · Nikos Karamanos<br>
-      Manuscript ID: cancers-4241215 · Accepted on 05 May 2026
-    </div>
-    <div class="pub-journal">Cancers · ISSN 2072-6694 · MDPI Open Access Journal · Impact Factor 4.4 · CiteScore 8.8</div>
+    <div class="pub-meta">Babas R. · Vynios D.H.* · Kompothrekas A. · Boutsinas B. · Karamanos N.*<br>Biochemistry, Biochemical Analysis &amp; Matrix Pathobiochemistry Research Group · Dept. of Chemistry, University of Patras, Greece</div>
+    <div class="pub-journal">Cancers (ISSN 2072-6694) · IF 4.4 · CiteScore 8.8 · PubMed Indexed · Accepted 05 May 2026</div>
+
   </div>
 </div>
 
@@ -725,7 +796,7 @@ footer span, footer a {
         <div class="tl-role">CNN Crop Diagnostic System</div>
         <div class="tl-org">Master's Thesis · ENSBIOTECH, Algeria</div>
         <ul class="tl-bullets">
-          <li>Deep learning model achieving 88–89% accuracy for multi-class crop disease classification</li>
+          <li>Deep learning model achieving 96%+ accuracy for multi-class crop disease classification</li>
           <li>Large-scale data analysis with computational modeling and rigorous validation</li>
         </ul>
       </div>
@@ -871,8 +942,8 @@ footer span, footer a {
       <p class="contact-sub">Open to collaborations at the intersection of biotechnology and AI — bioinformatics, cancer genomics, precision medicine, NGS analysis.</p>
     </div>
     <div class="contact-links">
-      <a href="mailto:babas.rami@gmail.com" class="contact-link">
-        <div><div class="contact-link-label">Email</div><div class="contact-link-val">babas.rami@gmail.com</div></div>
+      <a href="/cdn-cgi/l/email-protection#b8dad9dad9cb96cad9d5d1f8dfd5d9d1d496dbd7d5" class="contact-link">
+        <div><div class="contact-link-label">Email</div><div class="contact-link-val"><span class="__cf_email__" data-cfemail="87e5e6e5e6f4a9f5e6eaeec7e0eae6eeeba9e4e8ea">[email&#160;protected]</span></div></div>
         <span class="contact-arrow">↗</span>
       </a>
       <a href="https://linkedin.com/in/ramibabas" target="_blank" class="contact-link">
@@ -887,16 +958,40 @@ footer span, footer a {
         <div><div class="contact-link-label">ORCID</div><div class="contact-link-val">0009-0006-5466-2482</div></div>
         <span class="contact-arrow">↗</span>
       </a>
+
     </div>
   </div>
 </section>
 
 <footer>
   <span>Rami Babas · Patras, Greece · +30 694 729 9927</span>
-  <span><a href="mailto:babas.rami@gmail.com">babas.rami@gmail.com</a></span>
+  <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cfadaeadaebce1bdaea2a68fa8a2aea6a3e1aca0a2">[email&#160;protected]</a></span>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ── CUSTOM CURSOR ── */
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+  rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('a, button, [data-tilt], .stat-block, .cert-chip').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cur.style.width = '20px'; cur.style.height = '20px';
+    ring.style.width = '56px'; ring.style.height = '56px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cur.style.width = '12px'; cur.style.height = '12px';
+    ring.style.width = '36px'; ring.style.height = '36px';
+  });
+});
+
 /* ── SCROLL PROGRESS ── */
 const prog = document.getElementById('progress');
 window.addEventListener('scroll', () => {
@@ -906,13 +1001,10 @@ window.addEventListener('scroll', () => {
 });
 
 /* ── MARQUEE ── */
-const words = ['Deep Learning','Bioinformatics','NGS Analysis','Precision Medicine','Cancer Genomics','CNN','RNA-seq','Survival Analysis','Microfluidics','Python','TensorFlow','scRNA-seq','Variant Calling','ECM Proteases','Accepted in Cancers'];
+const words = ['Deep Learning','Bioinformatics','NGS Analysis','Precision Medicine','Cancer Genomics','CNN','RNA-seq','Survival Analysis','Microfluidics','Python','TensorFlow','scRNA-seq','Variant Calling','ECM Proteases'];
 const track = document.getElementById('marquee-track');
 const items = [...words, ...words].map(w => {
-  const d = document.createElement('div');
-  d.className = 'marquee-item';
-  d.textContent = w;
-  return d;
+  const d = document.createElement('div'); d.className = 'marquee-item'; d.textContent = w; return d;
 });
 items.forEach(i => track.appendChild(i));
 
@@ -921,8 +1013,7 @@ const phrases = [
   'Building AI pipelines for cancer prognosis.',
   'Developing NGS workflows for genomic analysis.',
   'Merging deep learning with life sciences.',
-  'Engineering precision diagnostic systems.',
-  'Author of an accepted Cancers publication on breast cancer survival prediction.'
+  'Engineering precision diagnostic systems.'
 ];
 const target = document.getElementById('hero-type-target');
 let pi = 0, ci = 0, del = false;
@@ -939,13 +1030,14 @@ function typeLoop() {
     if (ci < 0) {
       del = false;
       pi = (pi + 1) % phrases.length;
+      window.dispatchEvent(new CustomEvent('heroScene', { detail: pi }));
       setTimeout(typeLoop, 300);
       return;
     }
     setTimeout(typeLoop, 22);
   }
 }
-setTimeout(typeLoop, 900);
+setTimeout(typeLoop, 1200);
 
 /* ── SCROLL REVEAL ── */
 const revObs = new IntersectionObserver(entries => {
@@ -972,74 +1064,479 @@ const revObs = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
 
 const tlObs = new IntersectionObserver(entries => {
-  entries.forEach((e, i) => {
-    if (e.isIntersecting) {
-      setTimeout(() => e.target.classList.add('visible'), i * 100);
-    }
-  });
+  entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 100); } });
 }, { threshold: 0.1 });
-document.querySelectorAll('.tl-item').forEach((el, i) => {
-  el.style.transitionDelay = i * 0.08 + 's';
-  tlObs.observe(el);
-});
+document.querySelectorAll('.tl-item').forEach((el, i) => { el.style.transitionDelay = i * 0.08 + 's'; tlObs.observe(el); });
 
-/* ── HERO CANVAS: SIMPLE MOLECULAR / NETWORK MOTION ── */
+/* ── ADAPTIVE HERO VISUALIZATION ── */
+/* Single particle system that morphs between 4 scenes, each tied to a typing phrase:
+   0  Neural network  → "Building AI pipelines for cancer prognosis"
+   1  DNA double helix → "Developing NGS workflows for genomic analysis"
+   2  Cell + neural hybrid → "Merging deep learning with life sciences"
+   3  Circuit / data flow → "Engineering precision diagnostic systems"
+*/
 (function() {
   const canvas = document.getElementById('mol-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   const CX = W / 2, CY = H / 2;
-  const colors = ['#c0704a', '#5a8a6a', '#4a6a8a', '#c09040'];
-  const nodes = Array.from({length: 48}, (_, i) => ({
-    a: (i / 48) * Math.PI * 2,
-    r: 70 + (i % 4) * 34,
-    s: 0.002 + (i % 7) * 0.0008,
-    size: 3 + (i % 5) * 0.7,
-    color: colors[i % colors.length]
-  }));
-  let frame = 0;
+
+  // ── palette (matches CSS tokens) ──
+  const TERRA = [192, 112, 74];
+  const AMBER = [196, 154, 74];
+  const SAGE  = [90, 138, 106];
+  const SLATE = [74, 106, 138];
+  const INK   = [26, 21, 16];
+  const INK2  = [61, 51, 40];
+  const INK3  = [122, 106, 88];
+  const rgba  = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+
+  // ── particle pool ──
+  const N = 84;
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: CX, y: CY, tx: CX, ty: CY,
+      lerp: 0.045 + Math.random() * 0.04,
+      role: '', data: {},
+      size: 3, color: INK2,
+      phase: Math.random() * Math.PI * 2,
+      pulse: 0.5 + Math.random() * 0.5,
+    });
+  }
+
+  let currentScene = 0, frame = 0;
+  const overlayA = [0, 0, 0, 0];
+
+  // mouse parallax
+  let mx = CX, my = CY, parX = 0, parY = 0;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mx = e.clientX - r.left; my = e.clientY - r.top;
+  });
+  canvas.addEventListener('mouseleave', () => { mx = CX; my = CY; });
+
+  /* ─────────────── SCENE 0 — NEURAL NETWORK ─────────────── */
+  const NN_LAYERS = [4, 6, 6, 3];
+  const NN_X = NN_LAYERS.map((_, i) => 70 + i * (W - 140) / (NN_LAYERS.length - 1));
+  const nnY = (li, ni) => CY - (NN_LAYERS[li] - 1) * 26 + ni * 52;
+
+  function assignNNPacket(d) {
+    d.li = Math.floor(Math.random() * (NN_LAYERS.length - 1));
+    d.fromN = Math.floor(Math.random() * NN_LAYERS[d.li]);
+    d.toN = Math.floor(Math.random() * NN_LAYERS[d.li + 1]);
+  }
+  function setNeural() {
+    let p = 0;
+    for (let li = 0; li < NN_LAYERS.length; li++) {
+      for (let ni = 0; ni < NN_LAYERS[li]; ni++) {
+        const part = particles[p++];
+        part.tx = NN_X[li]; part.ty = nnY(li, ni);
+        part.role = 'nn-node'; part.data = { li, ni };
+        part.size = (li === 0 || li === NN_LAYERS.length - 1) ? 6 : 5;
+        part.color = li === NN_LAYERS.length - 1 ? TERRA :
+                     li === 0 ? INK2 : SLATE;
+      }
+    }
+    while (p < N) {
+      const part = particles[p++];
+      part.role = 'nn-pkt';
+      part.data = { t: Math.random(), speed: 0.004 + Math.random() * 0.006 };
+      assignNNPacket(part.data);
+      part.size = 1.6; part.color = TERRA;
+    }
+  }
+  function updateNeural() {
+    particles.forEach(p => {
+      if (p.role !== 'nn-pkt') return;
+      p.data.t += p.data.speed;
+      if (p.data.t > 1) { p.data.t = 0; assignNNPacket(p.data); }
+      const t = p.data.t;
+      const x1 = NN_X[p.data.li], x2 = NN_X[p.data.li + 1];
+      const y1 = nnY(p.data.li, p.data.fromN);
+      const y2 = nnY(p.data.li + 1, p.data.toN);
+      p.tx = x1 + (x2 - x1) * t;
+      p.ty = y1 + (y2 - y1) * t;
+    });
+  }
+  function drawNN(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    // dense connections
+    for (let li = 0; li < NN_LAYERS.length - 1; li++) {
+      for (let i = 0; i < NN_LAYERS[li]; i++) {
+        for (let j = 0; j < NN_LAYERS[li + 1]; j++) {
+          const seed = (li * 97 + i * 31 + j * 17) % 100;
+          const w = 0.06 + (seed / 100) * 0.16;
+          ctx.beginPath();
+          ctx.moveTo(NN_X[li], nnY(li, i));
+          ctx.lineTo(NN_X[li + 1], nnY(li + 1, j));
+          ctx.strokeStyle = rgba(INK2, w);
+          ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+    }
+    // dashed layer rules
+    NN_X.forEach((x, li) => {
+      const c = NN_LAYERS[li];
+      ctx.beginPath();
+      ctx.moveTo(x, nnY(li, 0) - 32);
+      ctx.lineTo(x, nnY(li, c - 1) + 32);
+      ctx.strokeStyle = rgba(INK3, 0.1);
+      ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
+      ctx.stroke(); ctx.setLineDash([]);
+    });
+    // layer labels
+    const labels = ['INPUT', 'HIDDEN', 'HIDDEN', 'OUTPUT'];
+    ctx.font = '8px DM Mono, monospace';
+    ctx.fillStyle = rgba(INK3, 0.55);
+    ctx.textAlign = 'center';
+    NN_X.forEach((x, li) => {
+      ctx.fillText(labels[li], x, nnY(li, NN_LAYERS[li] - 1) + 50);
+    });
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE 1 — DNA DOUBLE HELIX ─────────────── */
+  const DNA_PAIRS = 18;
+  const DNA_TURNS = 2.4;
+  const DNA_R = 88;
+  const DNA_H = 360;
+  const DNA_TOP = CY - DNA_H / 2;
+  const BASES = ['A', 'T', 'G', 'C'];
+  const DNA_PAIR_BASES = [];
+  for (let i = 0; i < DNA_PAIRS; i++) {
+    const a = Math.floor(Math.random() * 4);
+    DNA_PAIR_BASES.push([BASES[a], BASES[a < 2 ? 1 - a : 5 - a]]);
+  }
+  let helixRot = 0;
+
+  function setDNA() {
+    let p = 0;
+    for (let i = 0; i < DNA_PAIRS; i++) {
+      const t = i / (DNA_PAIRS - 1);
+      const ba = t * DNA_TURNS * Math.PI * 2;
+      const pA = particles[p++];
+      pA.role = 'dna'; pA.data = { i, strand: 0, ba, depth: 0 };
+      pA.tx = CX + Math.cos(ba + helixRot) * DNA_R;
+      pA.ty = DNA_TOP + t * DNA_H;
+      pA.size = 5; pA.color = SAGE;
+      const pB = particles[p++];
+      pB.role = 'dna'; pB.data = { i, strand: 1, ba, depth: 0 };
+      pB.tx = CX + Math.cos(ba + helixRot + Math.PI) * DNA_R;
+      pB.ty = DNA_TOP + t * DNA_H;
+      pB.size = 5; pB.color = TERRA;
+    }
+    while (p < N) {
+      const part = particles[p++];
+      part.role = 'dna-amb';
+      part.data = {
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.003 + Math.random() * 0.005,
+        side: Math.random() < 0.5 ? -1 : 1,
+        offset: 30 + Math.random() * 80,
+      };
+      part.size = 1.4; part.color = INK3;
+    }
+  }
+  function updateDNA() {
+    helixRot += 0.011;
+    particles.forEach(p => {
+      if (p.role === 'dna') {
+        const t = p.data.i / (DNA_PAIRS - 1);
+        const ang = p.data.ba + helixRot + (p.data.strand === 1 ? Math.PI : 0);
+        p.data.depth = (Math.sin(ang) + 1) / 2;
+        p.tx = CX + Math.cos(ang) * DNA_R;
+        p.ty = DNA_TOP + t * DNA_H;
+        p.size = 3.5 + p.data.depth * 2.5;
+      } else if (p.role === 'dna-amb') {
+        p.data.phase += p.data.speed;
+        const t = ((p.data.phase / (Math.PI * 2)) % 1 + 1) % 1;
+        p.tx = CX + p.data.side * (DNA_R + p.data.offset) + Math.sin(p.data.phase * 1.4) * 8;
+        p.ty = DNA_TOP + t * DNA_H;
+      }
+    });
+  }
+  function drawDNA(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    const pairs = {};
+    particles.forEach(p => {
+      if (p.role !== 'dna') return;
+      if (!pairs[p.data.i]) pairs[p.data.i] = [null, null];
+      pairs[p.data.i][p.data.strand] = p;
+    });
+    // backbones (smooth strand curves)
+    for (let s = 0; s < 2; s++) {
+      ctx.beginPath();
+      let first = true;
+      for (let i = 0; i < DNA_PAIRS; i++) {
+        if (!pairs[i] || !pairs[i][s]) continue;
+        const p = pairs[i][s];
+        if (first) { ctx.moveTo(p.x, p.y); first = false; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = rgba(s === 0 ? SAGE : TERRA, 0.55);
+      ctx.lineWidth = 1.6; ctx.stroke();
+    }
+    // base-pair rungs + nucleotide letters
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < DNA_PAIRS; i++) {
+      const pp = pairs[i]; if (!pp || !pp[0] || !pp[1]) continue;
+      const dx = Math.abs(pp[0].x - pp[1].x);
+      const al = 0.12 + (dx / (DNA_R * 2)) * 0.4;
+      ctx.beginPath();
+      ctx.moveTo(pp[0].x, pp[0].y);
+      ctx.lineTo(pp[1].x, pp[1].y);
+      ctx.strokeStyle = rgba(INK2, al);
+      ctx.lineWidth = 1; ctx.stroke();
+      const bs = DNA_PAIR_BASES[i];
+      ctx.fillStyle = rgba(SAGE, 0.62);
+      ctx.textAlign = pp[0].x > CX ? 'left' : 'right';
+      ctx.fillText(bs[0], pp[0].x + (pp[0].x > CX ? 8 : -8), pp[0].y);
+      ctx.fillStyle = rgba(TERRA, 0.62);
+      ctx.textAlign = pp[1].x > CX ? 'left' : 'right';
+      ctx.fillText(bs[1], pp[1].x + (pp[1].x > CX ? 8 : -8), pp[1].y);
+    }
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE 2 — CELL + NEURAL HYBRID ─────────────── */
+  const CELL_OUT = 40;
+  const CELL_SYN = 30;
+  const synPos = [];
+  for (let i = 0; i < CELL_SYN; i++) {
+    const ang = (i / CELL_SYN) * Math.PI * 2 + (i % 3) * 0.7;
+    const r = 28 + (i % 4) * 22 + Math.sin(i * 1.7) * 8;
+    synPos.push({ x: CX + Math.cos(ang) * r, y: CY + Math.sin(ang) * r * 0.92 });
+  }
+  const synLinks = [];
+  for (let i = 0; i < CELL_SYN; i++) {
+    const dists = [];
+    for (let j = 0; j < CELL_SYN; j++) {
+      if (i === j) continue;
+      dists.push([j, Math.hypot(synPos[i].x - synPos[j].x, synPos[i].y - synPos[j].y)]);
+    }
+    dists.sort((a, b) => a[1] - b[1]);
+    dists.slice(0, 2).forEach(([j]) => { if (i < j) synLinks.push([i, j]); });
+  }
+  function cellOutline(t) {
+    const ang = t * Math.PI * 2;
+    const wob = Math.sin(ang * 3 + 0.5) * 5 + Math.sin(ang * 7) * 2.5;
+    const r = 142 + wob;
+    return { x: CX + Math.cos(ang) * r, y: CY + Math.sin(ang) * r * 0.95 };
+  }
+  function setCell() {
+    let p = 0;
+    for (let i = 0; i < CELL_OUT; i++) {
+      const t = i / CELL_OUT;
+      const pt = cellOutline(t);
+      const part = particles[p++];
+      part.role = 'cell-out'; part.data = { t };
+      part.tx = pt.x; part.ty = pt.y;
+      part.size = 2.4; part.color = TERRA;
+    }
+    for (let i = 0; i < CELL_SYN; i++) {
+      const part = particles[p++];
+      part.role = 'cell-syn'; part.data = { i };
+      part.tx = synPos[i].x; part.ty = synPos[i].y;
+      part.size = 3.4; part.color = SAGE;
+    }
+    while (p < N) {
+      const part = particles[p++];
+      const ang = Math.random() * Math.PI * 2;
+      const r = 145 + Math.random() * 20;
+      part.role = 'cell-amb';
+      part.data = { ang, baseR: r, phase: Math.random() * Math.PI * 2 };
+      part.tx = CX + Math.cos(ang) * r;
+      part.ty = CY + Math.sin(ang) * r * 0.95;
+      part.size = 1.2; part.color = INK3;
+    }
+  }
+  function updateCell() {
+    particles.forEach(p => {
+      if (p.role === 'cell-amb') {
+        p.data.phase += 0.01;
+        const r = p.data.baseR + Math.sin(p.data.phase) * 6;
+        p.tx = CX + Math.cos(p.data.ang) * r;
+        p.ty = CY + Math.sin(p.data.ang) * r * 0.95;
+      }
+    });
+  }
+  function drawCell(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    // membrane outline
+    const out = particles.filter(p => p.role === 'cell-out')
+      .sort((x, y) => x.data.t - y.data.t);
+    if (out.length > 2) {
+      ctx.beginPath();
+      out.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.closePath();
+      ctx.fillStyle = rgba(TERRA, 0.04); ctx.fill();
+      ctx.strokeStyle = rgba(TERRA, 0.5);
+      ctx.lineWidth = 1.3; ctx.stroke();
+    }
+    // synaptic connections + travelling sparks
+    const syn = particles.filter(p => p.role === 'cell-syn')
+      .sort((x, y) => x.data.i - y.data.i);
+    synLinks.forEach(([i, j]) => {
+      if (!syn[i] || !syn[j]) return;
+      const A = syn[i], B = syn[j];
+      const pulse = (Math.sin(frame * 0.03 + i * 0.7) + 1) / 2;
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y);
+      ctx.strokeStyle = rgba(SAGE, 0.18 + pulse * 0.22);
+      ctx.lineWidth = 1; ctx.stroke();
+      const sp = (frame * 0.012 + i * 0.41) % 1;
+      const sx = A.x + (B.x - A.x) * sp;
+      const sy = A.y + (B.y - A.y) * sp;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1.6, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(TERRA, 0.85);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE 3 — CIRCUIT / DATA FLOW ─────────────── */
+  const G = 5;
+  const CELLW = 64;
+  const GX0 = CX - (G - 1) * CELLW / 2;
+  const GY0 = CY - (G - 1) * CELLW / 2;
+  const traces = [];
+  for (let gy = 0; gy < G; gy++) {
+    for (let gx = 0; gx < G; gx++) {
+      const seed = (gx * 31 + gy * 17) % 100;
+      if (gx < G - 1 && seed < 75) traces.push({ a: [gx, gy], b: [gx + 1, gy] });
+      if (gy < G - 1 && ((gx * 17 + gy * 41) % 100) < 70) traces.push({ a: [gx, gy], b: [gx, gy + 1] });
+    }
+  }
+  const gxy = (gx, gy) => ({ x: GX0 + gx * CELLW, y: GY0 + gy * CELLW });
+  function setCircuit() {
+    let p = 0;
+    for (let gy = 0; gy < G; gy++) {
+      for (let gx = 0; gx < G; gx++) {
+        if (p >= N) break;
+        const part = particles[p++];
+        const pt = gxy(gx, gy);
+        part.role = 'cir-chip'; part.data = { gx, gy };
+        part.tx = pt.x; part.ty = pt.y;
+        part.size = 4; part.color = AMBER;
+      }
+    }
+    while (p < N) {
+      const part = particles[p++];
+      part.role = 'cir-pkt';
+      part.data = {
+        tr: traces[Math.floor(Math.random() * traces.length)],
+        t: Math.random(),
+        speed: 0.005 + Math.random() * 0.008,
+      };
+      part.size = 1.5; part.color = TERRA;
+    }
+  }
+  function updateCircuit() {
+    particles.forEach(p => {
+      if (p.role !== 'cir-pkt') return;
+      p.data.t += p.data.speed;
+      if (p.data.t > 1) {
+        p.data.t = 0;
+        p.data.tr = traces[Math.floor(Math.random() * traces.length)];
+      }
+      const a = gxy(p.data.tr.a[0], p.data.tr.a[1]);
+      const b = gxy(p.data.tr.b[0], p.data.tr.b[1]);
+      p.tx = a.x + (b.x - a.x) * p.data.t;
+      p.ty = a.y + (b.y - a.y) * p.data.t;
+    });
+  }
+  function drawCircuit(a) {
+    ctx.save(); ctx.globalAlpha = a;
+    // PCB-like traces
+    traces.forEach(tr => {
+      const A = gxy(tr.a[0], tr.a[1]);
+      const B = gxy(tr.b[0], tr.b[1]);
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y);
+      ctx.strokeStyle = rgba(INK2, 0.22);
+      ctx.lineWidth = 1; ctx.stroke();
+    });
+    // chip housings — gentle clock pulse
+    for (let gy = 0; gy < G; gy++) {
+      for (let gx = 0; gx < G; gx++) {
+        const pt = gxy(gx, gy);
+        const phase = frame * 0.018 + (gx + gy) * 0.4;
+        const pulse = 0.4 + (Math.sin(phase) + 1) / 4;
+        ctx.strokeStyle = rgba(AMBER, pulse * 0.55);
+        ctx.lineWidth = 1;
+        ctx.strokeRect(pt.x - 8, pt.y - 8, 16, 16);
+      }
+    }
+    ctx.restore();
+  }
+
+  /* ─────────────── SCENE MANAGEMENT ─────────────── */
+  const SCENE_FNS = [setNeural, setDNA, setCell, setCircuit];
+  function setScene(i) {
+    if (i === currentScene) return;
+    currentScene = i;
+    SCENE_FNS[i]();
+  }
+  setNeural();
+  particles.forEach(p => { p.x = p.tx; p.y = p.ty; });
+  overlayA[0] = 1;
+  window.addEventListener('heroScene', e => setScene(e.detail));
+
+  /* ─────────────── DRAW LOOP ─────────────── */
   function draw() {
     frame++;
     ctx.clearRect(0, 0, W, H);
-    const pts = nodes.map(n => {
-      const a = n.a + frame * n.s;
-      return {
-        x: CX + Math.cos(a) * n.r + Math.sin(frame * 0.01 + n.r) * 12,
-        y: CY + Math.sin(a * 1.2) * n.r * 0.72,
-        size: n.size,
-        color: n.color
-      };
+    parX += ((mx - CX) * 0.05 - parX) * 0.06;
+    parY += ((my - CY) * 0.05 - parY) * 0.06;
+
+    if (currentScene === 0) updateNeural();
+    else if (currentScene === 1) updateDNA();
+    else if (currentScene === 2) updateCell();
+    else if (currentScene === 3) updateCircuit();
+
+    particles.forEach(p => {
+      p.x += (p.tx - p.x) * p.lerp;
+      p.y += (p.ty - p.y) * p.lerp;
     });
-    pts.forEach((p, i) => {
-      pts.forEach((q, j) => {
-        if (j <= i) return;
-        const d = Math.hypot(p.x - q.x, p.y - q.y);
-        if (d < 92) {
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(q.x, q.y);
-          ctx.strokeStyle = 'rgba(61,51,40,' + (0.16 * (1 - d / 92)) + ')';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-      });
+    overlayA.forEach((a, i) => {
+      const t = i === currentScene ? 1 : 0;
+      overlayA[i] = a + (t - a) * 0.05;
     });
-    pts.forEach(p => {
+
+    ctx.save();
+    ctx.translate(parX, parY);
+    if (overlayA[0] > 0.01) drawNN(overlayA[0]);
+    if (overlayA[1] > 0.01) drawDNA(overlayA[1]);
+    if (overlayA[2] > 0.01) drawCell(overlayA[2]);
+    if (overlayA[3] > 0.01) drawCircuit(overlayA[3]);
+
+    // particles, sorted by Y for soft depth
+    const sorted = [...particles].sort((a, b) => a.y - b.y);
+    sorted.forEach(p => {
+      const pulse = 1 + Math.sin(frame * 0.045 + p.phase) * 0.13 * p.pulse;
+      const r = p.size * pulse;
+      // shadow
       ctx.beginPath();
-      ctx.arc(p.x + 1.5, p.y + 1.5, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(26,21,16,0.08)';
-      ctx.fill();
+      ctx.arc(p.x + 1.4, p.y + 1.4, r, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(INK, 0.07); ctx.fill();
+      // body
+      const grad = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, 0, p.x, p.y, r);
+      grad.addColorStop(0, rgba(p.color, 1));
+      grad.addColorStop(1, rgba(p.color, 0.55));
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = grad; ctx.fill();
     });
+    ctx.restore();
+
     requestAnimationFrame(draw);
   }
   draw();
 })();
-
 
 /* ── SKILL CONSTELLATION ── */
 (function() {
@@ -1277,7 +1774,9 @@ document.querySelectorAll('.btn-mag').forEach(btn => {
     const y = e.clientY - r.top - r.height/2;
     btn.style.transform = `translate(${x*0.18}px, ${y*0.18}px)`;
   });
-  btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+  });
 });
 </script>
 </body>
