@@ -1,6 +1,5 @@
 /* =================================================================
    Rami Babas — Portfolio Scripts
-   Vanilla JS · IIFE-organized · IntersectionObserver-driven
    ================================================================= */
 (() => {
   'use strict';
@@ -194,11 +193,12 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     MARQUEE
+     MARQUEE  —  runs continuously from page load, never stops
      ───────────────────────────────────────────────────────────── */
   (() => {
     const track = document.getElementById('marquee-track');
     if (!track) return;
+
     const keywords = [
       'Deep Learning', 'Bioinformatics', 'NGS Analysis', 'Precision Medicine',
       'Cancer Genomics', 'Machine Learning', 'Survival Analysis', 'Single-cell RNA-seq',
@@ -209,30 +209,37 @@
       'Digital Twin', 'Pharmaceutical Engineering', 'Biotechnology',
       'Clinical Chemistry', 'Food Quality Analytics', 'Open Access Research'
     ];
-    const buildItems = () => keywords.map(k =>
+
+    const buildSet = () => keywords.map(k =>
       `<span class="marquee-item"><span class="marquee-diamond" aria-hidden="true"></span>${k}</span>`
     ).join('');
-    // Duplicate for seamless loop
-    track.innerHTML = buildItems() + buildItems();
+
+    // Two identical sets — when first set scrolls out, snap back to 0
+    track.innerHTML = buildSet() + buildSet();
 
     let x = 0;
-    const speed = 0.6;
+    const SPEED = 0.6; // px per frame (~36 px/s at 60 fps)
+    let paused = false;
     let rafId;
-    let isPaused = false;
 
-    function animate() {
-      if (!isPaused) {
-        x -= speed;
-        const halfWidth = track.scrollWidth / 2;
-        if (Math.abs(x) >= halfWidth) x = 0;
-        track.style.transform = `translate3d(${x}px, 0, 0)`;
+    function tick() {
+      if (!paused) {
+        x -= SPEED;
+        // halfWidth = width of one set; snap creates seamless loop
+        const half = track.scrollWidth / 2;
+        if (x <= -half) x = 0;
+        track.style.transform = `translate3d(${x}px,0,0)`;
       }
-      rafId = requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(tick);
     }
 
-    track.addEventListener('mouseenter', () => { isPaused = true; });
-    track.addEventListener('mouseleave', () => { isPaused = false; });
-    animate();
+    // Pause on hover for readability
+    track.addEventListener('mouseenter', () => { paused = true; });
+    track.addEventListener('mouseleave', () => { paused = false; });
+
+    // Kick off immediately — no scroll dependency
+    tick();
+
     window.addEventListener('pagehide', () => cancelAnimationFrame(rafId));
   })();
 
