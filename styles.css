@@ -1,6 +1,5 @@
 /* =================================================================
    Rami Babas — Portfolio Stylesheet
-   Editorial parchment aesthetic · light & dark themes · 2026
    ================================================================= */
 
 /* ── Theme tokens ────────────────────────────────────────────────── */
@@ -1819,4 +1818,5 @@ footer {
   }
   [data-reveal] { opacity: 1; transform: none; }
   .tl-row { opacity: 1; transform: none; }
+
 }
