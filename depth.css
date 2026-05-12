@@ -1,0 +1,511 @@
+/* =================================================================
+   depth.css — 3D pop-out layer
+   Adds tilt, layered shadows, parallax, z-axis lift, and floating
+   chrome that breaks out of the flat plane. Pairs with styles.css.
+   ================================================================= */
+
+/* ── Global perspective stage ───────────────────────────────────── */
+:root {
+  --shadow-1:
+    0 1px 1px rgba(15, 13, 10, 0.04),
+    0 2px 4px rgba(15, 13, 10, 0.05),
+    0 6px 14px -4px rgba(15, 13, 10, 0.10),
+    0 18px 32px -10px rgba(15, 13, 10, 0.12);
+  --shadow-2:
+    0 2px 2px rgba(15, 13, 10, 0.05),
+    0 8px 18px -4px rgba(15, 13, 10, 0.10),
+    0 28px 48px -16px rgba(15, 13, 10, 0.18),
+    0 60px 90px -32px rgba(15, 13, 10, 0.20);
+  --shadow-3:
+    0 4px 4px rgba(15, 13, 10, 0.06),
+    0 14px 28px -6px rgba(15, 13, 10, 0.14),
+    0 40px 70px -20px rgba(15, 13, 10, 0.24),
+    0 90px 140px -40px rgba(15, 13, 10, 0.28);
+}
+[data-theme="dark"] {
+  --shadow-1:
+    0 1px 1px rgba(0, 0, 0, 0.30),
+    0 4px 8px rgba(0, 0, 0, 0.30),
+    0 12px 24px -4px rgba(0, 0, 0, 0.45),
+    0 28px 48px -16px rgba(0, 0, 0, 0.55);
+  --shadow-2:
+    0 2px 2px rgba(0, 0, 0, 0.35),
+    0 12px 24px -4px rgba(0, 0, 0, 0.40),
+    0 36px 60px -20px rgba(0, 0, 0, 0.55),
+    0 80px 120px -40px rgba(0, 0, 0, 0.70);
+  --shadow-3:
+    0 4px 4px rgba(0, 0, 0, 0.40),
+    0 18px 32px -6px rgba(0, 0, 0, 0.50),
+    0 60px 100px -24px rgba(0, 0, 0, 0.65),
+    0 120px 180px -50px rgba(0, 0, 0, 0.80);
+}
+
+/* Pages get perspective so child transforms feel volumetric */
+body { perspective: 1600px; perspective-origin: 50% 30%; }
+
+/* ── 3D HERO NAME ───────────────────────────────────────────────── */
+.hero-name {
+  transform-style: preserve-3d;
+  position: relative;
+  z-index: 5;
+}
+.hero-name .line {
+  position: relative;
+  display: block;
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--ink) 92%, transparent),
+    0 2px 0 color-mix(in srgb, var(--ink) 84%, transparent),
+    0 3px 0 color-mix(in srgb, var(--ink) 74%, transparent),
+    0 4px 0 color-mix(in srgb, var(--ink) 60%, transparent),
+    0 6px 0 color-mix(in srgb, var(--ink) 40%, transparent),
+    0 10px 22px rgba(15, 13, 10, 0.25),
+    0 22px 44px rgba(15, 13, 10, 0.18);
+  animation: heroFloat 7s ease-in-out infinite;
+  will-change: transform;
+}
+.hero-name .line:nth-child(2) {
+  animation-delay: -3.5s;
+}
+.hero-name em {
+  text-shadow:
+    0 1px 0 color-mix(in oklch, var(--scene-color) 80%, transparent),
+    0 3px 0 color-mix(in oklch, var(--scene-color) 60%, transparent),
+    0 5px 0 color-mix(in oklch, var(--scene-color) 36%, transparent),
+    0 12px 28px color-mix(in oklch, var(--scene-color) 35%, transparent),
+    0 24px 48px color-mix(in oklch, var(--scene-color) 22%, transparent);
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateX(0deg); }
+  50%      { transform: translate3d(0, -6px, 30px) rotateX(-2deg); }
+}
+
+/* Pop hero status / eyebrow toward camera */
+.hero-status   { transform: translateZ(20px); box-shadow: var(--shadow-1); }
+.hero-eyebrow  { transform: translateZ(10px); }
+.hero-cta      { transform: translateZ(40px); }
+.hero-desc     { transform: translateZ(12px); }
+.hero-grid     { transform-style: preserve-3d; }
+.hero-text     { transform-style: preserve-3d; }
+
+/* Watermark sinks back */
+.hero-watermark {
+  transform: translateZ(-160px);
+  filter: blur(0.5px);
+  animation: watermarkDrift 14s ease-in-out infinite;
+}
+@keyframes watermarkDrift {
+  0%, 100% { transform: translateZ(-160px) translate3d(0, 0, 0); }
+  50%      { transform: translateZ(-160px) translate3d(-12px, 8px, 0); }
+}
+
+/* ── HERO CANVAS — orbital depth ───────────────────────────────── */
+.canvas-stage { transform-style: preserve-3d; }
+.canvas-stage::before { transform: translateZ(-80px) scale(1.05); }
+#mol-canvas {
+  transform: translateZ(40px);
+  filter: drop-shadow(0 30px 40px rgba(15, 13, 10, 0.18));
+  animation: canvasBob 9s ease-in-out infinite;
+}
+@keyframes canvasBob {
+  0%, 100% { transform: translateZ(40px) translateY(0px) rotateZ(0deg); }
+  50%      { transform: translateZ(60px) translateY(-10px) rotateZ(0.6deg); }
+}
+.canvas-rings {
+  transform: translateZ(20px);
+  border-width: 1px;
+  border-style: dashed;
+}
+.canvas-rings.r2 {
+  inset: 12%;
+  transform: translateZ(70px) rotate(0deg);
+  animation: ringSpin2 40s linear infinite reverse;
+  opacity: 0.35;
+}
+.canvas-rings.r3 {
+  inset: -6%;
+  transform: translateZ(-30px);
+  animation: ringSpin3 80s linear infinite;
+  opacity: 0.22;
+}
+@keyframes ringSpin2 { to { transform: translateZ(70px) rotate(-360deg); } }
+@keyframes ringSpin3 { to { transform: translateZ(-30px) rotate(360deg); } }
+
+.scene-indicators {
+  transform: translateZ(50px);
+  box-shadow: var(--shadow-1);
+}
+
+/* ── SECTION HEADERS ───────────────────────────────────────────── */
+.section-head {
+  transform-style: preserve-3d;
+  perspective: 1200px;
+}
+.section-title {
+  transform-style: preserve-3d;
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--ink) 88%, transparent),
+    0 2px 0 color-mix(in srgb, var(--ink) 72%, transparent),
+    0 3px 0 color-mix(in srgb, var(--ink) 55%, transparent),
+    0 8px 18px rgba(15, 13, 10, 0.15),
+    0 20px 40px rgba(15, 13, 10, 0.10);
+}
+.section-title em {
+  text-shadow:
+    0 1px 0 color-mix(in oklch, var(--scene-color) 75%, transparent),
+    0 3px 0 color-mix(in oklch, var(--scene-color) 50%, transparent),
+    0 10px 22px color-mix(in oklch, var(--scene-color) 35%, transparent);
+}
+.section-num {
+  display: inline-block;
+  transform: translateZ(30px);
+  padding: 4px 10px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: var(--shadow-1);
+}
+
+/* ── TILT PRIMITIVE (driven by scripts.js) ─────────────────────── */
+[data-tilt] {
+  transform-style: preserve-3d;
+  transform: perspective(1100px)
+             rotateX(var(--tx, 0deg))
+             rotateY(var(--ty, 0deg))
+             translateZ(var(--tz, 0px));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  position: relative;
+}
+[data-tilt]::before {
+  /* glare */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--paper) 38%, transparent) 0%,
+    transparent 45%);
+  mix-blend-mode: overlay;
+  opacity: var(--glare, 0);
+  transition: opacity 0.4s;
+  z-index: 3;
+}
+[data-tilt].is-tilting {
+  transition: box-shadow 0.4s;
+}
+[data-tilt].is-tilting::before { opacity: 0.9; }
+
+/* ── STATS — full 3D treatment ─────────────────────────────────── */
+.stats-grid {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  gap: 18px;
+  perspective: 1500px;
+  perspective-origin: 50% 30%;
+}
+.stat {
+  border-radius: 14px;
+  background: linear-gradient(140deg,
+    color-mix(in srgb, var(--paper) 100%, transparent) 0%,
+    color-mix(in srgb, var(--paper-2) 100%, transparent) 100%);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-1);
+  padding: 44px 28px 36px;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: default;
+}
+.stat::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -20%,
+      color-mix(in oklch, var(--scene-color) 14%, transparent) 0%,
+      transparent 60%),
+    linear-gradient(180deg, transparent 0%,
+      color-mix(in srgb, var(--ink) 3%, transparent) 100%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
+  transition: opacity 0.4s var(--ease-soft);
+}
+.stat::after {
+  /* underline hover */
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--scene-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-soft);
+  z-index: 1;
+}
+.stat:hover {
+  background: linear-gradient(140deg,
+    color-mix(in srgb, var(--paper) 100%, transparent) 0%,
+    color-mix(in srgb, var(--paper-3) 100%, transparent) 100%);
+  color: var(--ink);
+  box-shadow: var(--shadow-3);
+  --tz: 24px;
+}
+.stat:hover::after { transform: scaleX(1); }
+.stat:hover .stat-mark { color: var(--scene-color); transform: rotate(-12deg) translateZ(40px); opacity: 1; }
+.stat:hover .stat-glyph { transform: translateZ(80px) scale(1.15) rotate(8deg); opacity: 0.5; }
+
+.stat > * { position: relative; z-index: 2; }
+.stat-mark {
+  transform: translateZ(20px);
+  transition: color 0.35s, transform 0.5s var(--ease-out), opacity 0.35s;
+}
+.stat-num {
+  display: inline-block;
+  transform: translateZ(60px);
+  background: linear-gradient(180deg,
+    var(--ink) 0%,
+    color-mix(in srgb, var(--ink) 88%, var(--scene-color) 12%) 70%,
+    color-mix(in srgb, var(--ink) 72%, var(--scene-color) 28%) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter:
+    drop-shadow(0 2px 0 color-mix(in srgb, var(--ink) 35%, transparent))
+    drop-shadow(0 6px 18px rgba(15, 13, 10, 0.15))
+    drop-shadow(0 14px 28px color-mix(in oklch, var(--scene-color) 22%, transparent));
+  transition: transform 0.5s var(--ease-out), filter 0.4s;
+}
+.stat:hover .stat-num {
+  transform: translateZ(120px) scale(1.05);
+  filter:
+    drop-shadow(0 4px 0 color-mix(in srgb, var(--ink) 40%, transparent))
+    drop-shadow(0 14px 36px rgba(15, 13, 10, 0.30))
+    drop-shadow(0 28px 60px color-mix(in oklch, var(--scene-color) 40%, transparent));
+}
+.stat-label {
+  transform: translateZ(20px);
+  transition: transform 0.5s var(--ease-out), color 0.35s;
+}
+.stat-label em {
+  font-style: italic;
+  font-family: var(--f-display);
+  color: var(--scene-color);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-size: 13px;
+  transition: color 0.6s var(--ease-soft);
+}
+.stat-glyph {
+  position: absolute;
+  bottom: -16px;
+  right: -8px;
+  font-family: var(--f-display);
+  font-size: 200px;
+  font-weight: 900;
+  line-height: 1;
+  color: color-mix(in oklch, var(--scene-color) 8%, transparent);
+  pointer-events: none;
+  transform: translateZ(0px);
+  transition: transform 0.7s var(--ease-out), opacity 0.4s, color 0.6s var(--ease-soft);
+  opacity: 0.35;
+  z-index: 0;
+}
+
+/* override base .stat styles from styles.css that conflict */
+.stat:hover { background: ; }
+.stats-grid { background: transparent !important; border: none !important; }
+
+/* ── PUBLICATION CARD — popping metrics ─────────────────────────── */
+.pub-card {
+  transform-style: preserve-3d;
+  box-shadow: var(--shadow-3);
+}
+.pub-card .pub-title { transform: translateZ(30px); }
+.pub-card .pub-card-top { transform: translateZ(20px); }
+.pub-card .pub-authors,
+.pub-card .pub-affil { transform: translateZ(10px); }
+.pub-card .pub-actions { transform: translateZ(40px); }
+.pub-card .pub-tags { transform: translateZ(15px); }
+.pub-metrics {
+  transform: translateZ(50px);
+  perspective: 1000px;
+  box-shadow:
+    0 20px 40px -12px rgba(0, 0, 0, 0.45),
+    0 40px 80px -24px rgba(0, 0, 0, 0.55);
+}
+.pub-metric {
+  transform-style: preserve-3d;
+  transition: transform 0.5s var(--ease-out), background 0.4s;
+}
+.pub-metric:hover {
+  transform: translateZ(30px);
+}
+.pub-metric-num {
+  transform: translateZ(20px);
+  text-shadow:
+    0 1px 0 color-mix(in oklch, var(--amber) 70%, transparent),
+    0 3px 0 color-mix(in oklch, var(--amber) 45%, transparent),
+    0 10px 24px color-mix(in oklch, var(--amber) 40%, transparent);
+  transition: transform 0.5s var(--ease-out);
+}
+.pub-metric:hover .pub-metric-num { transform: translateZ(50px) scale(1.04); }
+
+/* ── WORK CARDS ─────────────────────────────────────────────────── */
+.work-grid { perspective: 1500px; perspective-origin: 50% 30%; }
+.work-card {
+  transform-style: preserve-3d;
+  background: linear-gradient(150deg,
+    var(--paper) 0%,
+    color-mix(in srgb, var(--paper-2) 100%, transparent) 100%);
+  box-shadow: var(--shadow-1);
+}
+.work-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-3);
+  --tz: 30px;
+}
+.work-card .work-tag    { transform: translateZ(40px); box-shadow: 0 6px 14px -4px rgba(15,13,10,0.12); }
+.work-card .work-title  { transform: translateZ(30px); }
+.work-card .work-body   { transform: translateZ(15px); }
+.work-card .work-meta   { transform: translateZ(20px); }
+
+/* ── EDU CARDS ──────────────────────────────────────────────────── */
+.edu-grid { perspective: 1500px; perspective-origin: 50% 30%; }
+.edu-card {
+  transform-style: preserve-3d;
+  background: linear-gradient(150deg,
+    var(--paper) 0%,
+    color-mix(in srgb, var(--paper-2) 100%, transparent) 100%);
+  box-shadow: var(--shadow-1);
+}
+.edu-card:hover {
+  box-shadow: var(--shadow-3);
+  --tz: 30px;
+}
+.edu-card .edu-year   { transform: translateZ(40px); box-shadow: 0 6px 14px -4px rgba(15,13,10,0.10); }
+.edu-card .edu-degree { transform: translateZ(30px); }
+.edu-card .edu-school { transform: translateZ(15px); }
+.edu-card .edu-focus  { transform: translateZ(10px); }
+.edu-card .edu-mark {
+  transform: translateZ(60px);
+  font-size: 130px;
+  color: color-mix(in oklch, var(--scene-color) 12%, transparent);
+  text-shadow:
+    0 4px 0 color-mix(in oklch, var(--scene-color) 8%, transparent),
+    0 12px 28px color-mix(in oklch, var(--scene-color) 18%, transparent);
+}
+
+/* ── TIMELINE — 3D nodes ────────────────────────────────────────── */
+.tl-row { transform-style: preserve-3d; }
+.tl-dot {
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--paper) 100%, transparent),
+    0 4px 10px rgba(15, 13, 10, 0.25),
+    0 12px 24px color-mix(in oklch, var(--scene-color) 25%, transparent);
+  transform: translateX(-50%) translateZ(20px);
+}
+.tl-row:hover .tl-dot {
+  transform: translateX(-50%) translateZ(40px) scale(1.4);
+}
+.tl-time {
+  transform: translateZ(10px);
+}
+.tl-body { transform: translateZ(15px); }
+.tl-row:hover .tl-role {
+  transform: translateZ(30px);
+  transition: transform 0.5s var(--ease-out);
+}
+
+/* ── CHIPS — micro depth on hover ──────────────────────────────── */
+.chips { perspective: 1200px; }
+.chip {
+  transform: translateZ(0);
+  box-shadow: var(--shadow-1);
+  transition: transform 0.4s var(--ease-out), color 0.3s, border-color 0.3s, box-shadow 0.4s;
+}
+.chip:hover {
+  transform: translateY(-3px) translateZ(20px) rotateX(-4deg);
+  box-shadow: var(--shadow-2);
+}
+
+/* ── MARQUEE — float */
+.marquee { box-shadow: var(--shadow-2); }
+.marquee-item {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 0 rgba(255, 255, 255, 0.03),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── BUTTONS — depth ────────────────────────────────────────────── */
+.btn { box-shadow: var(--shadow-1); }
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.btn-solid {
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.18),
+    0 6px 14px -4px rgba(15, 13, 10, 0.30),
+    0 18px 32px -10px rgba(15, 13, 10, 0.40);
+}
+
+/* ── CONTACT LINKS — slide forward ──────────────────────────────── */
+.contact-grid { transform-style: preserve-3d; perspective: 1400px; }
+.contact-heading {
+  transform: translateZ(30px);
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--paper) 92%, transparent),
+    0 3px 0 color-mix(in srgb, var(--paper) 70%, transparent),
+    0 6px 0 color-mix(in srgb, var(--paper) 40%, transparent),
+    0 14px 30px rgba(0, 0, 0, 0.45),
+    0 30px 60px rgba(0, 0, 0, 0.30);
+}
+.contact-heading em {
+  text-shadow:
+    0 1px 0 color-mix(in oklch, var(--amber) 80%, transparent),
+    0 3px 0 color-mix(in oklch, var(--amber) 60%, transparent),
+    0 6px 0 color-mix(in oklch, var(--amber) 35%, transparent),
+    0 14px 32px color-mix(in oklch, var(--amber) 55%, transparent),
+    0 30px 60px color-mix(in oklch, var(--amber) 35%, transparent);
+}
+.contact-link { transform-style: preserve-3d; }
+.contact-link:hover { transform: translateZ(20px); }
+
+/* ── SCENE INDICATORS lift ──────────────────────────────────────── */
+.scene-dot.is-active { box-shadow: 0 6px 14px -4px rgba(15, 13, 10, 0.15); }
+
+/* ── CONSTELLATION lifts off ────────────────────────────────────── */
+.constellation {
+  box-shadow: var(--shadow-2);
+  transform-style: preserve-3d;
+}
+.leg { box-shadow: var(--shadow-1); transform: translateZ(20px); }
+
+/* ── Mobile: dial down 3D so things stay flat-ish ──────────────── */
+@media (max-width: 700px) {
+  body { perspective: none; }
+  [data-tilt] { transform: none !important; }
+  [data-tilt]::before { display: none; }
+  .stat-glyph { font-size: 130px; }
+  .hero-name .line {
+    text-shadow:
+      0 1px 0 color-mix(in srgb, var(--ink) 80%, transparent),
+      0 3px 0 color-mix(in srgb, var(--ink) 50%, transparent),
+      0 6px 12px rgba(15, 13, 10, 0.20);
+    animation: none;
+  }
+  .canvas-rings.r2, .canvas-rings.r3 { display: none; }
+}
+
+/* Reduced motion: disable bobbing/floating but keep static depth */
+@media (prefers-reduced-motion: reduce) {
+  .hero-name .line,
+  #mol-canvas,
+  .canvas-rings,
+  .canvas-rings.r2,
+  .canvas-rings.r3,
+  .hero-watermark { animation: none !important; }
+  [data-tilt] { transform: none !important; }
+}
